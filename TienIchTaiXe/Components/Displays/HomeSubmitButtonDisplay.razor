@@ -1,0 +1,332 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: true))
+@inject IJSRuntime JS
+
+<section class="mb-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <div class="p-4 md:p-5">
+
+        <button type="button"
+                disabled
+                class="mb-4 flex w-full cursor-default items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
+            <div class="flex items-center">
+                <img src="/imgs/csgt.ico"
+                     alt="Cục CSGT"
+                     class="mr-2 h-6 w-6 rounded" />
+                <div class="text-left">
+                    <div class="text-xs font-semibold tracking-wide text-slate-600 uppercase">
+                        Tra từ Cục CSGT
+                    </div>
+                </div>
+            </div>
+        </button>
+
+        <!-- FORM TRA CỨU -->
+        <div class="mb-4">
+            <label for="plateInput"
+                   class="mb-1 block font-medium tracking-wide text-[11px] text-slate-500 uppercase">
+                Nhập biển số xe
+            </label>
+
+            <div class="flex items-stretch rounded-xl border border-slate-200 bg-white shadow-sm focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-500/60">
+                <span class="flex items-center px-3 text-base">
+                    <span class="text-slate-400">🚗</span>
+                </span>
+
+                <input id="plateInput"
+                       @bind="textValue"
+                       @bind:event="oninput"
+                       class="w-full rounded-r-xl border-0 bg-transparent px-2 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+                       autocomplete="off"
+                       placeholder="Ví dụ: 83F00101" />
+            </div>
+
+            <div class="mt-1 text-[11px] text-slate-400">
+                Chỉ nhập biển số xe ô tô của bạn. Ví dụ đúng: <code class="text-[11px] text-pink-600">83F00101</code>.
+            </div>
+        </div>
+
+        <!-- TRẠNG THÁI KIỂM TRA NGAY TRONG CARD -->
+        @if (isLoading)
+        {
+            <div class="mb-3 flex items-center rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                <span class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-[2px] border-blue-500 border-t-transparent"></span>
+                <span>Đang tra cứu dữ liệu phạt nguội...</span>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="mb-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
+                @errorMessage
+            </div>
+        }
+        else if (violations != null && violations.Count > 0)
+        {
+            <div class="mb-3 flex items-center rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                <span class="mr-2">✅</span>
+                <span>
+                    Tìm thấy <b>@violations.Count</b> kết quả cho biển số:
+                    <b>@result</b>.
+                </span>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(result))
+        {
+            <div class="mb-3 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                Quá tải dữ liệu: <b>@result</b>.
+            </div>
+        }
+
+        <!-- NÚT TRA CỨU -->
+        <button class="inline-flex w-full items-center justify-center rounded-xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-60"
+                type="button"
+                @onmousedown="SubmitForm"
+                disabled="@isLoading">
+            @if (!isInteractive)
+            {
+                <span class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-[2px] border-white border-t-transparent"></span>
+                <span>Đang tải...</span>
+            }
+            else if (isLoading)
+            {
+                <span class="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-[2px] border-white border-t-transparent"></span>
+                <span>Đang tra cứu...</span>
+            }
+            else
+            {
+                <span>Tra ngay</span>
+            }
+        </button>
+
+        <!--GET NOTIFICATION Tạm thời không đùng
+        <HomeSubmitNotificationDisplay /> -->
+
+    </div>
+</section>
+
+<!-- KHU VỰC HIỂN THỊ LIST KẾT QUẢ CHI TIẾT -->
+@if (!isLoading && string.IsNullOrEmpty(errorMessage) && violations != null && violations.Count > 0)
+{
+    <section class="mb-2">
+        <h5 class="mb-2 text-sm font-semibold text-slate-800">Chi tiết vi phạm</h5>
+    </section>
+
+    @foreach (var v in violations)
+    {
+        if (string.IsNullOrWhiteSpace(v.status))
+        {
+            <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-6 text-center text-sm text-emerald-900 shadow-sm">
+                <!-- Icon check -->
+                <div class="mb-3 flex justify-center">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-700 text-white">
+                        <!-- Có thể dùng Heroicons / Font Awesome, tạm để SVG -->
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293A1 1 0 006.293 10.707l2 2a1 1 0 001.414 0l4-4z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Dòng thông báo chính -->
+                <p class="mb-1 text-base font-semibold">
+                    Ô tô biển số
+                    <span class="mx-1 inline-block rounded-md border border-emerald-800 bg-white px-2 py-0.5 text-sm font-bold tracking-wide">
+                        @textValue
+                    </span>
+                    chưa phát hiện lỗi vi phạm.
+                </p>
+                <p class="mb-4 text-sm">
+                    Hãy kiểm tra thường xuyên để cập nhật dữ liệu mới nhất!
+                </p>
+
+                <!-- Thông tin chi tiết giống ảnh -->
+                <div class="mt-2 space-y-1 text-xs text-emerald-900/90">
+                    <p>
+                        <span class="font-semibold">Loại phương tiện:</span>
+                        <span class="ml-1">Ô tô</span>
+                    </p>
+                    <p>
+                        <span class="font-semibold">Thời gian cập nhật gần nhất:</span>
+                        <span class="ml-1">@DateTime.Now.ToString("HH:mm:ss dd/MM/yyyy")</span>
+                    </p>
+                    <p>
+                        <span class="font-semibold">Nguồn trả kết quả:</span>
+                        <span class="ml-1">Cổng thông tin điện tử Cục CSGT</span>
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <section class="mb-3 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-900 shadow-sm">
+                <div class="p-4 md:p-5">
+
+                    <!-- Header mỗi kết quả -->
+                    <div class="mb-3 border-b border-slate-100 pb-3">
+                        <div class="mb-1 flex items-center justify-between">
+                            <div>
+                                <div class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Biển số</div>
+                                <div class="text-lg font-bold text-slate-900">@v.licensePlate</div>
+                            </div>
+
+                            <div class="text-right">
+                                <div class="tracking-wide text-[11px] text-slate-400 uppercase">Trạng thái</div>
+                                <span class="inline-flex rounded-full px-2.5 py-1 font-semibold text-[11px] @GetStatusBadgeClass(v.status)">
+                                    @(!string.IsNullOrWhiteSpace(v.status) ? v.status : "Không bị phạt")
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mt-1 text-xs text-slate-500">
+                            @v.vehicleType
+                            @if (!string.IsNullOrWhiteSpace(v.plateColor))
+                            {
+                                <span> • @v.plateColor</span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Body chi tiết -->
+                    <dl class="grid grid-cols-[80px,1fr] gap-x-3 gap-y-2 text-xs text-slate-700 md:text-sm">
+                        <dt class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Thời gian</dt>
+                        <dd class="text-slate-800">@v.violationTime</dd>
+
+                        <dt class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Địa điểm</dt>
+                        <dd class="text-slate-800">@v.violationLocation</dd>
+
+                        <dt class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Hành vi</dt>
+                        <dd class="text-slate-800">@v.violationBehavior</dd>
+
+                        <dt class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Đơn vị phát hiện</dt>
+                        <dd class="text-slate-800">@v.detectingUnit</dd>
+
+                        <dt class="font-medium tracking-wide text-[11px] text-slate-400 uppercase">Nơi xử lý</dt>
+                        <dd class="text-slate-800">@v.resolutionPlaceText</dd>
+                    </dl>
+                </div>
+            </section>
+        }
+    }
+
+    if (affiliateBanners != null || affiliateBanners?.Count < 0)
+    {
+        <!-- SLIDER ADS DÀNH CHO TÀI XẾ -->
+        <section class="mt-4 rounded-2xl border border-orange-100 bg-orange-50 px-4 py-3 text-xs text-orange-800 shadow-sm">
+            <p class="mb-1 text-sm font-semibold">
+                Đồng hành cùng <span class="text-pink-600">Tiện Ích Tài Xế</span> 🚗
+            </p>
+
+            <p class="mb-2">
+                Công cụ tra cứu phạt nguội được <b>Tiện Ích Tài Xế</b> xây dựng để anh em tài xế dùng
+                <b>miễn phí</b>, tra nhanh – gọn – rõ ràng.
+            </p>
+
+            <p class="mb-3">
+                Nếu thấy tiện ích này hữu ích, bạn có thể ủng hộ Tiện Ích Tài Xế bằng cách tham khảo một số sản phẩm giảm giá dành cho tài xế bên dưới.
+                Mua qua link gợi ý <b>không làm tăng giá</b> cho bạn, nhưng giúp chúng tôi có thêm chi phí duy trì server và phát triển thêm tiện ích mới.
+            </p>
+
+            <!-- SLIDER ADS DÀNH CHO TÀI XẾ -->
+            <AdBannerDisplay AdBanners="@affiliateBanners"
+                             @rendermode="new InteractiveServerRenderMode(prerender: true)" />
+
+            <p class="mt-2 text-[11px] text-orange-700/80">
+                *Một cú click ủng hộ nhỏ của bạn là động lực rất lớn để Tiện Ích Tài Xế tiếp tục phát triển cho cộng đồng anh em tài xế.
+            </p>
+        </section>
+    }
+}
+else if (!isLoading && string.IsNullOrEmpty(errorMessage) && !string.IsNullOrWhiteSpace(result) && (violations == null || violations.Count == 0))
+{
+    <!-- Đã tra mà không có kết quả -->
+    <section class="mt-1 rounded-2xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700 shadow-sm">
+        Không có dữ liệu vi phạm cho biển số: <b>@result</b>.
+    </section>
+
+}
+else
+{
+    <!-- Trạng thái giới thiệu ban đầu -->
+    <section class="mt-4 text-[11px] text-slate-400">
+        Trang này giúp bạn tra cứu nhanh thông tin phạt nguội theo biển số xe trên toàn quốc.
+    </section>
+}
+
+@code {
+    private string textValue = "";
+    private string result = "";
+    private string? errorMessage;
+    private bool isLoading = false;
+
+    [Inject]
+    private IViolationService service { get; set; } = default!;
+    public List<Violation> violations { get; set; } = new();
+    [Parameter]
+    public List<AdBanner> affiliateBanners { get; set; } = new();
+
+    private bool isInteractive;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isInteractive = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitForm()
+    {
+
+        // Không cho double-click khi đang loading
+        if (isLoading) return;
+
+        errorMessage = null;
+        violations = new();
+        result = "";
+
+
+        if (!textValue.TryValidateAndNormalizePlate(out var normalizedPlate, out var plateError))
+        {
+            errorMessage = plateError;
+            return;
+        }
+
+        try
+        {
+            isLoading = true;
+            result = normalizedPlate;
+            StateHasChanged(); // cho chắc là UI cập nhật ngay
+
+            // Tra cứu dữ liệu
+            violations = await service.Gets(normalizedPlate) ?? new List<Violation>();
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Không kết nối được đến Cổng CSGT. Vui lòng thử lại!";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // Tailwind badge class
+    private string GetStatusBadgeClass(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+            return "bg-slate-200 text-slate-700";
+
+        var s = status.ToLowerInvariant();
+
+        if (s.Contains("chưa") || s.Contains("đang"))
+            return "bg-amber-100 text-amber-700";
+
+        if (s.Contains("đã xử lý") || s.Contains("đã nộp"))
+            return "bg-emerald-100 text-emerald-700";
+
+        return "bg-red-100 text-red-700";
+    }
+}

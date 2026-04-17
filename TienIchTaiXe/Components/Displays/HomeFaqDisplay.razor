@@ -1,0 +1,100 @@
+﻿<section id="faq" aria-label="Câu hỏi thường gặp về Tiện Ích Tài Xế"
+         class="mx-auto w-full max-w-3xl min-w-[320px] rounded-xl bg-white p-4 shadow-sm md:p-4">
+    <h2 class="text-xl font-semibold text-slate-900">
+        Câu hỏi thường gặp về Tiện Ích Tài Xế
+    </h2>
+    <p class="mt-2 text-sm text-slate-600">
+        Một số thắc mắc phổ biến khi sử dụng Tiện Ích Tài Xế để tra cứu phạt nguội ô tô theo biển số.
+    </p>
+
+    <div class="space-y-3">
+        <!-- Q1 (mở sẵn) -->
+        <details open class="group rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+            <summary class="flex cursor-pointer items-center justify-between text-sm font-medium text-slate-800">
+                <span>Tiện Ích Tài Xế là gì?</span>
+                <span class="ml-3 text-slate-400 transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Tiện Ích Tài Xế là website giúp tài xế tra cứu phạt nguội ô tô toàn quốc theo biển số.
+                Hệ thống hiển thị rõ thời gian, địa điểm, lỗi vi phạm và trạng thái xử lý để tài xế chủ động theo dõi.
+            </p>
+        </details>
+
+        <!-- Q2 -->
+        <details class="group rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+            <summary class="flex cursor-pointer items-center justify-between text-sm font-medium text-slate-800">
+                <span>Tiện Ích Tài Xế lấy dữ liệu phạt nguội từ đâu?</span>
+                <span class="ml-3 text-slate-400 transition-transform group-open:rotate-180">
+                    ▾
+                </span>
+            </summary>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Tiện Ích Tài Xế lấy dữ liệu từ nguồn phạt nguội chính thức của lực lượng Cảnh sát giao thông.
+                Website chỉ hỗ trợ hiển thị thông tin để tài xế tiện tra cứu, không thay thế cho các kênh làm việc
+                với cơ quan chức năng.
+            </p>
+        </details>
+
+        <!-- Q3 -->
+        <details class="group rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+            <summary class="flex cursor-pointer items-center justify-between text-sm font-medium text-slate-800">
+                <span>Tôi có phải đăng ký tài khoản hoặc trả phí khi tra cứu không?</span>
+                <span class="ml-3 text-slate-400 transition-transform group-open:rotate-180">
+                    ▾
+                </span>
+            </summary>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Hiện tại bạn có thể truy cập Tiện Ích Tài Xế và tra cứu phạt nguội theo biển số xe
+                mà không cần đăng ký tài khoản. Website được thiết kế tối giản để tài xế dùng nhanh và dễ hiểu.
+            </p>
+        </details>
+
+        <!-- Q4 -->
+        <details class="group rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+            <summary class="flex cursor-pointer items-center justify-between text-sm font-medium text-slate-800">
+                <span>Tiện Ích Tài Xế có dùng tốt trên điện thoại không?</span>
+                <span class="ml-3 text-slate-400 transition-transform group-open:rotate-180">
+                    ▾
+                </span>
+            </summary>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Giao diện Tiện Ích Tài Xế được tối ưu cho màn hình điện thoại, bố cục đơn giản, chữ rõ ràng
+                để tài xế có thể thao tác nhanh ngay cả khi đang bận rộn chạy xe.
+            </p>
+        </details>
+
+        <!-- Q5 -->
+        <details class="group rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
+            <summary class="flex cursor-pointer items-center justify-between text-sm font-medium text-slate-800">
+                <span>Nếu thông tin phạt nguội có sai sót tôi phải làm gì?</span>
+                <span class="ml-3 text-slate-400 transition-transform group-open:rotate-180">
+                    ▾
+                </span>
+            </summary>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                Nếu bạn nghi ngờ thông tin phạt nguội chưa chính xác, hãy liên hệ trực tiếp với cơ quan
+                Cảnh sát giao thông hoặc đơn vị xử lý vi phạm để được kiểm tra và hướng dẫn cụ thể.
+                Tiện Ích Tài Xế chỉ đóng vai trò hỗ trợ tra cứu, không có quyền chỉnh sửa dữ liệu vi phạm.
+            </p>
+        </details>
+    </div>
+</section>
+
+<script>
+    // Chỉ cho phép mở 1 <details> trong cùng 1 container
+    const container = document.querySelector(".space-y-3"); // hoặc đổi selector theo ý bạn
+
+    if (container) {
+      container.addEventListener("toggle", (e) => {
+        const current = e.target;
+        if (current.tagName !== "DETAILS") return;
+
+        // Chỉ khi thằng hiện tại đang được mở thì mới đóng các thằng khác
+        if (current.open) {
+          container.querySelectorAll("details").forEach((d) => {
+            if (d !== current) d.open = false;
+          });
+        }
+      }, true);
+    }
+</script>

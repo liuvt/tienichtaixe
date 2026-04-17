@@ -1,0 +1,58 @@
+﻿@page "/"
+@inject IAdBannerService AdBannerService
+
+<HeaderSEODisplay Title="Tra cứu phạt nguội ô tô toàn quốc theo biển số | Tiện Ích Tài Xế"
+                  Description="Tra cứu phạt nguội ô tô toàn quốc theo biển số. Hiển thị thời gian, địa điểm, lỗi vi phạm và trạng thái xử lý. Tối ưu cho tài xế."
+                  IncludeFaqSchema="true" />
+
+<main class="min-h-screen bg-slate-50 pb-6 pt-16 md:pb-10">
+    <div class="mx-auto w-full max-w-5xl px-4 md:px-6">
+        <!-- TIÊU ĐỀ + MÔ TẢ -->
+        <section class="mb-4">
+            <div class="text-center">
+                <h1 class="mb-1 mt-4 text-2xl font-semibold text-slate-900">
+                    Tra cứu phạt nguội ô tô toàn quốc theo biển số
+                </h1>
+                <p class="text-xs text-slate-500">
+                    Nhập <b>biển số xe</b> → chọn <b>Loại xe</b> → nhấn <b>Tra cứu</b> → xem kết quả bên dưới.
+                </p>
+            </div>
+        </section>
+
+
+        <section class="mt-6 md:mt-8">
+            <!-- MOBILE: block bình thường, DESKTOP/TABLET: flex 2 bên -->
+            <div class="md:flex md:items-start md:gap-6">
+                <!-- BÊN TRÁI – CỐ ĐỊNH 448PX -->
+                <div class="mx-auto w-full max-w-md space-y-4">
+                    <!-- CARD ADS BANNER -->
+                    <AdBannerDisplay AdBanners="@datasAdsHome" @rendermode="new InteractiveServerRenderMode(prerender: true)" />
+                    <!-- CARD TRA CỨU CHÍNH -->
+                    <HomeSubmitButtonDisplay affiliateBanners="@datasAdsHomeBelow" />
+                </div>
+
+                <!-- BÊN PHẢI – FQA -->
+                 <HomeFaqDisplay />
+            </div>
+        </section>
+    </div>
+</main>
+
+@code {
+    private List<Violation> violations { get; set; } = new();
+    private List<AdBanner> datasAdsHome = new();
+    private List<AdBanner> datasAdsHomeBelow = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allAds = (await AdBannerService.GetAllAsync()).ToList();
+
+        datasAdsHome = allAds
+            .Where(a => a.Placement == AdPlacement.HomeHeader)
+            .ToList();
+
+        datasAdsHomeBelow = allAds
+            .Where(a => a.Placement == AdPlacement.HomeBelow)
+            .ToList();
+    }
+}

@@ -1,0 +1,80 @@
+﻿@inject IJSRuntime JS
+
+@if (AdBanners is { Count: > 0 })
+{
+    <section class="mb-4">
+        <div class="relative w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
+             data-tvt-carousel
+             data-interval="2000">
+
+            <div class="flex transition-transform duration-500 ease-out"
+                 data-tvt-carousel-track>
+                @foreach (var ad in AdBanners)
+                {
+                    <div class="w-full flex-none" data-tvt-carousel-item>
+                        <a href="@ad.LinkUrl"
+                           target="@ad.Target"
+                           rel="noopener"
+                           class="block">
+                            <img src="@ad.ImageUrl"
+                                 class="block h-32 w-full object-fill md:h-40"
+                                 alt="@ad.Title" />
+                        </a>
+                    </div>
+                }
+            </div>
+
+            @if (AdBanners.Count > 1)
+            {
+                <!-- Nút trái/phải -->
+                <button type="button"
+                        class="absolute top-1/2 left-2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-slate-700 shadow hover:bg-white"
+                        data-tvt-carousel-prev>
+                    <span class="sr-only">Trước</span>
+                    <span class="inline-block text-xs font-bold">&lt;</span>
+                </button>
+
+                <button type="button"
+                        class="absolute top-1/2 right-2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-slate-700 shadow hover:bg-white"
+                        data-tvt-carousel-next>
+                    <span class="sr-only">Sau</span>
+                    <span class="inline-block text-xs font-bold">&gt;</span>
+                </button>
+
+                <!-- Dots -->
+                <div class="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5"
+                     data-tvt-carousel-dots>
+                    @for (int i = 0; i < AdBanners.Count; i++)
+                    {
+                        <button type="button"
+                                class="h-2 w-2 rounded-full bg-slate-300 transition-all @(i == 0 ? "scale-125 bg-pink-500" : "")"
+                                data-tvt-carousel-dot
+                                data-index="@i"
+                                aria-label="Slide @(i + 1)">
+                        </button>
+                    }
+                </div>
+            }
+
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public List<AdBanner> AdBanners { get; set; } = new();
+
+    private bool _carouselInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Dùng cờ riêng để tránh gọi lặp lại khi component re-render
+        if (_carouselInitialized)
+            return;
+
+        _carouselInitialized = true;
+
+        // GỌI ĐÚNG TÊN HÀM: "initTvtCarousel" (không có "window.")
+        await JS.InvokeVoidAsync("initTvtCarousel");
+    }
+}

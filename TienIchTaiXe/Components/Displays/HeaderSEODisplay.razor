@@ -1,0 +1,196 @@
+﻿@using System.Text.Json
+
+<PageTitle>@PageTitle</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="@PageDescription" />
+
+    <link rel="canonical" href="@CanonicalUrl" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Tiện Ích Tài Xế" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content="@PageTitle" />
+    <meta property="og:description" content="@PageDescription" />
+    <meta property="og:image" content="@AbsoluteImageUrl" />
+    <meta property="og:url" content="@CanonicalUrl" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@PageTitle" />
+    <meta name="twitter:description" content="@PageDescription" />
+    <meta name="twitter:image" content="@AbsoluteImageUrl" />
+
+    <meta name="robots" content="@(Robots ? "index, follow" : "noindex, nofollow")" />
+
+    @if (IncludeWebsiteSchema)
+    {
+        <script type="application/ld+json">
+            @((MarkupString)WebsiteSchemaJson)
+        </script>
+    }
+
+    @if (IncludeOrganizationSchema)
+    {
+        <script type="application/ld+json">
+            @((MarkupString)OrganizationSchemaJson)
+        </script>
+    }
+
+    @if (IncludeFaqSchema)
+    {
+        <script type="application/ld+json">
+            @((MarkupString)FaqSchemaJson)
+        </script>
+    }
+
+    @if (Ads)
+    {
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4772558027240339"
+                crossorigin="anonymous"></script>
+    }
+</HeadContent>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Image { get; set; }               // OG Image
+    [Parameter] public string? Logo { get; set; } // ✅ Logo vuông
+
+    [Parameter] public bool Robots { get; set; } = true;
+    [Parameter] public bool Ads { get; set; } = true;
+
+    [Parameter] public bool IncludeWebsiteSchema { get; set; } = true;
+    [Parameter] public bool IncludeOrganizationSchema { get; set; } = true;
+    [Parameter] public bool IncludeFaqSchema { get; set; } = false;
+
+    [Inject] public NavigationManager Nav { get; set; } = default!;
+
+    private string PageTitle => Title ?? "Tiện Ích Tài Xế – Tra cứu phạt nguội ô tô theo biển số";
+    private string PageDescription => Description ?? "Tiện Ích Tài Xế hỗ trợ tra cứu phạt nguội theo biển số, tối ưu cho tài xế.";
+    // Nếu không truyền Image => dùng Logo
+    private string PageLogo => string.IsNullOrWhiteSpace(Logo) ? "/logo.png" : Logo!;
+    private string PageImage => string.IsNullOrWhiteSpace(Image) ? PageLogo : Image!;
+
+    private string CanonicalUrl => new Uri(Nav.Uri).GetLeftPart(UriPartial.Path);
+
+    private string AbsoluteImageUrl => GetAbsoluteUrl(PageImage);
+    private string AbsoluteLogoUrl => GetAbsoluteUrl(PageLogo);
+
+
+    private static readonly JsonSerializerOptions JsonLdOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // để tiếng Việt không bị \uXXXX
+        WriteIndented = false
+    };
+
+    private string WebsiteSchemaJson => JsonSerializer.Serialize(
+        new Dictionary<string, object?>
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "WebSite",
+            ["name"] = "Tiện Ích Tài Xế",
+            ["url"] = CanonicalUrl,
+            ["description"] = PageDescription,
+            ["inLanguage"] = "vi-VN",
+            ["publisher"] = new Dictionary<string, object?>
+            {
+                ["@type"] = "Organization",
+                ["name"] = "TVT Team"
+            }
+        },
+        JsonLdOptions
+    );
+
+    private string OrganizationSchemaJson => JsonSerializer.Serialize(
+        new Dictionary<string, object?>
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "Organization",
+            ["name"] = "TVT Team",
+            ["url"] = CanonicalUrl,
+            ["logo"] = AbsoluteLogoUrl, // nhớ dùng logo vuông 512
+            ["email"] = "mailto:tvtteam2025@gmail.com",
+            ["description"] = "TVT Team phát triển nền tảng Tiện Ích Tài Xế, hỗ trợ tài xế tra cứu phạt nguội và các tiện ích số.",
+            ["contactPoint"] = new object[]
+            {
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "ContactPoint",
+                ["contactType"] = "support",
+                ["email"] = "mailto:tvtteam2025@gmail.com",
+                ["availableLanguage"] = new[] { "vi-VN" }
+            }
+            }
+        },
+        JsonLdOptions
+    );
+
+    private string FaqSchemaJson => JsonSerializer.Serialize(
+     new Dictionary<string, object?>
+     {
+         ["@context"] = "https://schema.org",
+         ["@type"] = "FAQPage",
+         ["mainEntity"] = new object[]
+         {
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "Question",
+                ["name"] = "Tiện Ích Tài Xế là gì?",
+                ["acceptedAnswer"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Answer",
+                    ["text"] = "Tiện Ích Tài Xế là website giúp tài xế tra cứu phạt nguội ô tô toàn quốc theo biển số. Hệ thống hiển thị rõ thời gian, địa điểm, lỗi vi phạm và trạng thái xử lý để tài xế chủ động theo dõi."
+                }
+            },
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "Question",
+                ["name"] = "Tiện Ích Tài Xế lấy dữ liệu phạt nguội từ đâu?",
+                ["acceptedAnswer"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Answer",
+                    ["text"] = "Tiện Ích Tài Xế lấy dữ liệu từ nguồn phạt nguội chính thức của lực lượng Cảnh sát giao thông. Website chỉ hỗ trợ hiển thị thông tin để tài xế tiện tra cứu, không thay thế cho các kênh làm việc với cơ quan chức năng."
+                }
+            },
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "Question",
+                ["name"] = "Tôi có phải đăng ký tài khoản hoặc trả phí khi tra cứu không?",
+                ["acceptedAnswer"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Answer",
+                    ["text"] = "Hiện tại bạn có thể truy cập Tiện Ích Tài Xế và tra cứu phạt nguội theo biển số xe mà không cần đăng ký tài khoản. Website được thiết kế tối giản để tài xế dùng nhanh và dễ hiểu."
+                }
+            },
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "Question",
+                ["name"] = "Tiện Ích Tài Xế có dùng tốt trên điện thoại không?",
+                ["acceptedAnswer"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Answer",
+                    ["text"] = "Giao diện Tiện Ích Tài Xế được tối ưu cho màn hình điện thoại, bố cục đơn giản, chữ rõ ràng để tài xế có thể thao tác nhanh ngay cả khi đang bận rộn chạy xe."
+                }
+            },
+            new Dictionary<string, object?>
+            {
+                ["@type"] = "Question",
+                ["name"] = "Nếu thông tin phạt nguội có sai sót tôi phải làm gì?",
+                ["acceptedAnswer"] = new Dictionary<string, object?>
+                {
+                    ["@type"] = "Answer",
+                    ["text"] = "Nếu bạn nghi ngờ thông tin phạt nguội chưa chính xác, hãy liên hệ trực tiếp với cơ quan Cảnh sát giao thông hoặc đơn vị xử lý vi phạm để được kiểm tra và hướng dẫn cụ thể. Tiện Ích Tài Xế chỉ đóng vai trò hỗ trợ tra cứu, không có quyền chỉnh sửa dữ liệu vi phạm."
+                }
+            }
+         }
+     },
+     JsonLdOptions
+ );
+
+    private string GetAbsoluteUrl(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) path = "/logo.png";
+        if (path.StartsWith("http")) return path;
+        return Nav.BaseUri.TrimEnd('/') + "/" + path.TrimStart('/');
+    }
+}
