@@ -48,7 +48,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 builder.Services.AddDbContext<tienichtaixeDBContext>(opt =>
 {
     //Default Vps
-    opt.UseSqlServer(builder.Configuration["ConnectionStrings:Default"] ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"));
+    opt.UseSqlServer(builder.Configuration["ConnectionStrings:Vps"] ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"));
 });
 
 // UI: Get httpClient API default

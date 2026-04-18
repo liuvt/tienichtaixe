@@ -16,7 +16,7 @@ public class NotificationServices : INotificationServices
     private SheetsService sheetsService;
     private readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
     private readonly string CredentialGGSheetService = "ggsheetaccount.json";
-    private readonly string AppName = "tienichtaixe-notify/1.0"; // <-- ASCII, không dấu
+    private readonly string AppName = "tienichtaixe-notify"; // <-- ASCII, không dấu
     private readonly string SpreadSheetId = "1yNpYJOfXqLOinjKpwgAwVyyi5V8KEF9fbEtlewrGLlY";
 
     // For Sheet
