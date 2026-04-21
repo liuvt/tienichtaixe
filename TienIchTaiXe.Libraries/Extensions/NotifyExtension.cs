@@ -2,6 +2,15 @@
 
 namespace TienIchTaiXe.Libraries.Extensions;
 
+// Các tiện ích mở rộng để chuẩn hóa và validate dữ liệu đầu vào (số điện thoại, biển số xe, email,...)
+// Trả về (IsValid, Normalized, Error)
+// Ví dụ: (ok, phoneNorm, err) = VnPhone.NormalizeAndValidate(dt.PhoneNumber);
+// Nếu ok = true thì phoneNorm đã được chuẩn hóa, ngược lại err sẽ chứa thông báo lỗi chi tiết để hiển thị cho người dùng
+// Lưu ý: Các quy tắc chuẩn hóa và validate có thể thay đổi theo yêu cầu thực tế của bạn, ví dụ:
+// - Số điện thoại có thể cho phép 11 số nếu bạn muốn hỗ trợ cả số cố định (VD: 02812345678)
+// - Biển số xe có thể có nhiều định dạng khác nhau tùy theo loại phương tiện và vùng miền
+// Bạn có thể mở rộng thêm các tiện ích khác như email, địa chỉ, tên người dùng,... theo cùng pattern trả về (IsValid, Normalized, Error)
+
 public static class VnPhoneExtension
 {
     // Trả về (IsValid, Normalized, Error)
