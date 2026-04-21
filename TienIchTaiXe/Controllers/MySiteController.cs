@@ -31,6 +31,8 @@ public class RobotsController : ControllerBase
         sb.AppendLine("# Không cho phép bot truy cập các vùng nội bộ");
         sb.AppendLine("Disallow: /admin/");
         sb.AppendLine("Disallow: /api/");
+        sb.AppendLine("Disallow: /checkers/");
+        sb.AppendLine("Disallow: /salary/");
         sb.AppendLine("Disallow: /_framework/");
         sb.AppendLine("Disallow: /swagger/");       // nếu có swagger
         sb.AppendLine();

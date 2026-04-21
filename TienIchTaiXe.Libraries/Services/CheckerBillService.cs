@@ -21,7 +21,7 @@ public class CheckerBillService : ICheckerBillService
         this.httpClient = httpClientFactory.CreateClient("taxinamthang");
     }
 
-    public async Task<ShiftWorkDto> Get2(string userId, string? date)
+    public async Task<ShiftWorkDto> Get(string userId, string? date)
     {
         try
         {
@@ -56,8 +56,8 @@ public class CheckerBillService : ICheckerBillService
         }
     }
 
-    
-    public async Task<ShiftWorkDto> Get(string userId, string? date)
+    //Tạm thời không dùng
+    public async Task<ShiftWorkDto> Get2(string userId, string? date)
     {
         try
         {
