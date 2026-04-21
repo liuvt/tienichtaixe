@@ -66,6 +66,14 @@ builder.Services.AddHttpClient("n8n", client =>
         ?? throw new InvalidOperationException("Missing API:BackEnd"));
 });
 
+// Phiếu checker
+builder.Services.AddHttpClient("taxinamthang", client =>
+{
+    client.BaseAddress = new Uri(
+        builder.Configuration["API:TaxiNamThang"]
+        ?? throw new InvalidOperationException("Missing API:TaxiNamThang"));
+});
+
 // API: Add Jwt, Gooogle Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -128,6 +136,8 @@ builder.Services.AddAuthorizationCore();
 //builder.Services.AddScoped<IAuthenService, AuthenService>();
 builder.Services.AddCascadingAuthenticationState();
 // UI: Register Client Services
+builder.Services.AddScoped<ICheckerBillService, CheckerBillService>();
+builder.Services.AddScoped<ICheckerSalaryService, CheckerSalaryService>();
 
 //For SQL Server
 #endregion
@@ -228,7 +238,7 @@ else // API: Add run Swagger UI: https://localhost:7154/swagger/index.html
 app.UseHttpsRedirection();   // nếu host free không có HTTPS thì có thể tắt dòng này
 app.UseStaticFiles();
 
-app.UseCookiePolicy();           // ⭐ thêm dòng này
+app.UseCookiePolicy();
 
 app.UseRouting();
 
@@ -237,17 +247,22 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Anti-forgery middleware – để SAU routing, TRƯỚC MapEndpoints
+// Dùng để tự động validate token chống CSRF cho các request POST/PUT/PATCH/DELETE, nếu token không hợp lệ sẽ trả về 400 Bad Request
 app.UseAntiforgery();
 
 app.MapControllers();
 
 // Xử lý header iframe, CSP
+// Dùng cho trang admin, nếu bạn có trang admin riêng thì chỉ nên đặt middleware này ở route admin để tăng cường bảo mật cho phần còn lại của site
 app.Use(async (context, next) =>
 {
     context.Response.OnStarting(() =>
     {
+        // X-Frame-Options: DENY hoặc SAMEORIGIN sẽ chặn hiển thị trang trong iframe
         context.Response.Headers.Remove("X-Frame-Options");
+        // CSP: frame-ancestors * cho phép hiển thị trang trong iframe từ mọi nguồn (bạn có thể tùy chỉnh lại nếu muốn chỉ cho phép từ một số domain nhất định)
         context.Response.Headers.Remove("Content-Security-Policy");
+        // Dùng đẻ cho phép hiển thị trang trong iframe, nếu bạn muốn chặn thì có thể đổi thành: "frame-ancestors 'none';"
         context.Response.Headers["Content-Security-Policy"] = "frame-ancestors *";
         return Task.CompletedTask;
     });

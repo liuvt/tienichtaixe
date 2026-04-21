@@ -1,0 +1,15 @@
+﻿@page "/checkers/{userId}"
+@page "/checkers/{userId}/{date}"
+@layout MainEmptyLayout
+
+<HeaderSEODisplay Title="Phiếu Checker v1.2"
+                    Description="@($"Tài xế {userId} - {date}")" Ads="false" />
+
+<CheckerBillComponent userId="@userId" date="@date" />
+
+@code {
+    [Parameter]
+    public string userId { get; set; } = string.Empty;
+    [Parameter]
+    public string? date { get; set; }
+}
