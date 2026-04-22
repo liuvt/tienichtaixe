@@ -3,9 +3,9 @@
 @layout MainEmptyLayout
 
 <HeaderSEODisplay Title="Phiếu Checker v1.2"
-                    Description="@($"Tài xế {userId} - {date}")" Ads="false" />
+                    Description="@($"Tài xế {userId} - {date}")" />
 
-<CheckerBillComponent userId="@userId" date="@date" />
+<CheckerBillComponentVer2 userId="@userId" date="@date" />
 
 @code {
     [Parameter]

@@ -18,7 +18,7 @@ public class RobotsController : ControllerBase
     }
 
     [HttpGet]
-    [ResponseCache(Duration = 86400)]
+    //[ResponseCache(Duration = 86400)]
     public IActionResult Index()
     {
         var baseUrl = $"{Request.Scheme}://{Request.Host}";

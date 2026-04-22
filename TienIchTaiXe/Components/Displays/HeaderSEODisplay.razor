@@ -57,7 +57,7 @@
     [Parameter] public string? Logo { get; set; } // ✅ Logo vuông
 
     [Parameter] public bool Robots { get; set; } = true;
-    [Parameter] public bool Ads { get; set; } = true;
+    [Parameter] public bool Ads { get; set; } = true; // Mặt đinh cho phép hiển thị quảng cáo (nếu có logic nào đó cần dùng)
 
     [Parameter] public bool IncludeWebsiteSchema { get; set; } = true;
     [Parameter] public bool IncludeOrganizationSchema { get; set; } = true;
@@ -65,8 +65,8 @@
 
     [Inject] public NavigationManager Nav { get; set; } = default!;
 
-    private string PageTitle => Title ?? "Tiện Ích Tài Xế – Tra cứu phạt nguội ô tô theo biển số";
-    private string PageDescription => Description ?? "Tiện Ích Tài Xế hỗ trợ tra cứu phạt nguội theo biển số, tối ưu cho tài xế.";
+    private string PageTitle => Title ?? "Tiện Ích Tài Xế";
+    private string PageDescription => Description ?? "Tiện Ích Tài Xế";
     // Nếu không truyền Image => dùng Logo
     private string PageLogo => string.IsNullOrWhiteSpace(Logo) ? "/logo.png" : Logo!;
     private string PageImage => string.IsNullOrWhiteSpace(Image) ? PageLogo : Image!;
