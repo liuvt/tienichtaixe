@@ -22,7 +22,7 @@ public class Trip
     public string NumberCar { get; set; } = string.Empty;
     public DateTime? tpTimeStart { get; set; }
     public DateTime? tpTimeEnd { get; set; }
-    public double? tpDistance { get; set; }
+    public double? tpDistance { get; set; } 
     [Column(TypeName = "decimal(18,2)")]
     public decimal? tpPrice { get; set; }
     public string tpPickUp { get; set; } = string.Empty;

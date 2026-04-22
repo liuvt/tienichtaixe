@@ -91,8 +91,12 @@ public class CheckerSalaryService : ICheckerSalaryService
     // Gọi service Bank(_sheetBank) để add vào Revenue
     public async Task<Salary> GetSalary(string userId)
     {
+        //Dicrypt userId trước khi so sánh, vì trong sheet đã được mã hóa để bảo mật thông tin tài xế
+        var _userId = CryptographyAESExtension.Decrypt(userId);
+        string keyword = SearchNormalizer.Normalize(_userId);
+
         var dts = await Gets();
-        var listSalary = dts.Where(e => e.userId.Equals(userId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+        var listSalary = dts.Where(e => e.userId.Equals(keyword, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
         if (listSalary == null)
         {
             throw new Exception("Không tìm thấy dữ liệu: {userId}");
@@ -131,8 +135,12 @@ public class CheckerSalaryService : ICheckerSalaryService
 
     public async Task<List<SalaryDetails>> GetSalaryDetails(string userId)
     {
+        //Dicrypt userId trước khi so sánh, vì trong sheet đã được mã hóa để bảo mật thông tin tài xế
+        var _userId = CryptographyAESExtension.Decrypt(userId);
+        string keyword = SearchNormalizer.Normalize(_userId);
+
         var dts = await GetsSalaryDetails();
-        var listSalaryDetails = dts.Where(e => e.userId.Equals(userId, StringComparison.OrdinalIgnoreCase)).ToList();
+        var listSalaryDetails = dts.Where(e => e.userId.Equals(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
         if (listSalaryDetails == null)
         {
             throw new Exception("Không tìm thấy dữ liệu: {userId}");
