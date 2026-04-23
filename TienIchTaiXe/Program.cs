@@ -44,10 +44,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
         .AddEntityFrameworkStores<tienichtaixeDBContext>()
         .AddDefaultTokenProviders();
 
-//Add connection string
-builder.Services.AddDbContext<tienichtaixeDBContext>(opt =>
+// Đăng ký DbContextFactory (Dành riêng cho Blazor Component để fix lỗi Disposed)
+builder.Services.AddDbContextFactory<tienichtaixeDBContext>(opt =>
 {
-    //Default Vps
     opt.UseSqlServer(builder.Configuration["ConnectionStrings:Vps"] ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"));
 });
 

@@ -9,158 +9,168 @@
                       Description="@($"Tin tức | {blog?.Title}. {blog?.Summary}")"
                       Image="@blog?.CoverImageUrl" />
 }
-<main id="top" class="min-h-screen bg-slate-50 pb-6 pt-16 md:pb-10">
-    <div class="mx-auto max-w-5xl px-4 py-10">
+
+<main id="top" class="min-h-screen bg-slate-50 pt-20 pb-12">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6">
 
         @if (blog == null)
         {
-            <p class="text-center text-gray-500">Đang tải tin tức...</p>
+            <div class="flex h-64 items-center justify-center">
+                <p class="text-lg font-medium text-slate-500">Đang tải nội dung bài viết...</p>
+            </div>
         }
         else
         {
-       
-            <!-- Breadcrumb -->
-            <nav class="mb-4 text-xs uppercase tracking-wide text-gray-500">
-                <a href="/" class="text-gray-700 hover:underline">Trang chủ</a> ›
-                <a href="/blogs" class="text-gray-700 hover:underline">Blogs</a> ›
-                <span>@blog.Title</span>
-            </nav>
+            <header class="mx-auto mb-8 max-w-4xl">
+                <nav class="mb-5 flex text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    <a href="/" class="transition-colors hover:text-indigo-600">Trang chủ</a>
+                    <span class="mx-2">›</span>
+                    <a href="/blogs" class="transition-colors hover:text-indigo-600">Tin tức</a>
+                    <span class="mx-2">›</span>
+                    <span class="line-clamp-1 text-slate-600">@blog.Category</span>
+                </nav>
 
-            <!-- 📰 Tiêu đề & Metadata -->
-            <article>
-                <h1 class="mb-4 border-l-8 border-red-600 pl-3 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl">
+                <h1 class="mb-6 border-l-4 border-indigo-600 pl-4 text-3xl leading-tight font-extrabold text-slate-900 md:text-4xl lg:text-5xl">
                     @blog.Title
                 </h1>
 
-                <!-- Meta -->
-                <div class="mb-8 flex flex-wrap items-center gap-6 border-b pb-4 text-sm text-gray-600">
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-slate-100 bg-white p-4 text-sm text-slate-600 shadow-sm">
+                    <div class="flex items-center gap-2 font-medium text-indigo-700">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>@blog.Author</span>
+                    </div>
                     <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M8 7V3m8 4V3m-9 8h10m-7 4h4m-9 4h14M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z" />
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10m-7 4h4m-9 4h14M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z" />
                         </svg>
                         <span>@blog.CreatedAt.ToString("dd/MM/yyyy")</span>
                     </div>
-
                     <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M15 10l4.553 2.276A2 2 0 0121 14.105V17a2 2 0 01-2 2H5a2 2 0 01-2-2v-2.895a2 2 0 011.447-1.829L9 10m6 0V7a3 3 0 00-6 0v3m6 0H9" />
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        <span>@blog.ViewCount.ToViewString() lượt xem</span>
+                        <span>@blog.ViewCount.ToString("N0") lượt xem</span>
                     </div>
+                </div>
+            </header>
 
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M5.121 17.804A1 1 0 016 17h12a1 1 0 01.879.516l2 3.5A1 1 0 0120 23H4a1 1 0 01-.879-1.484l2-3.5zM6 17V9a6 6 0 1112 0v8" />
-                        </svg>
-                        <span>@blog.Author</span>
+            <figure class="mx-auto mb-10 flex w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-100 shadow-lg ring-1 ring-slate-900/5">
+                <img src="@blog.CoverImageUrl"
+                     alt="@blog.Title"
+                     class="max-h-[550px] w-auto object-contain transition-transform duration-700 hover:scale-105" />
+            </figure>
+
+            
+
+            <article class="mx-auto max-w-4xl">
+                @if (!string.IsNullOrWhiteSpace(blog.Summary))
+                {
+                    <p class="mb-8 border-l-4 border-slate-300 pl-4 text-lg leading-relaxed font-semibold text-slate-700 italic">
+                        @blog.Summary
+                    </p>
+                }
+
+                <div class="prose prose-lg prose-slate max-w-none prose-a:text-indigo-600 hover:prose-a:text-indigo-500">
+                    <div class="ql-snow">
+                        <div class="ql-editor text-slate-800" style="padding: 0; font-size: 1.125rem; line-height: 1.8;">
+                            @((MarkupString)blog.Content)
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(blog.Tags))
+                {
+                    <div class="mt-10 flex flex-wrap gap-2">
+                        @foreach (var tag in blog.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <span class="cursor-pointer rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600 transition hover:bg-slate-200">
+                                #@tag.Trim()
+                            </span>
+                        }
+                    </div>
+                }
+
+                <div class="mt-8 flex items-center justify-between border-t border-slate-200 pt-6">
+                    <span class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Chia sẻ bài viết</span>
+                    <div class="flex gap-3">
+                        <a href="@($"https://www.facebook.com/sharer/sharer.php?u={NavManager.Uri}")" target="_blank" rel="noopener" class="rounded-full bg-blue-50 p-2 text-blue-600 shadow-sm transition-colors hover:bg-blue-600 hover:text-white">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.04 3.69 9.22 8.52 9.93v-7.03H8.24v-2.9h2.14V9.41c0-2.12 1.26-3.29 3.18-3.29.92 0 1.89.16 1.89.16v2.08h-1.07c-1.05 0-1.38.65-1.38 1.32v1.58h2.35l-.38 2.9h-1.97V22c4.83-.71 8.52-4.89 8.52-9.93z" /></svg>
+                        </a>
+                        <a href="@($"https://twitter.com/intent/tweet?url={NavManager.Uri}&text={Uri.EscapeDataString(blog.Title)}")" target="_blank" rel="noopener" class="rounded-full bg-sky-50 p-2 text-sky-500 shadow-sm transition-colors hover:bg-sky-500 hover:text-white">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 3h4.09l4.02 5.62L15.9 3H20l-6.15 8.37L20.5 21h-4.09l-4.26-5.94L8.1 21H4l6.31-8.65L4 3z" /></svg>
+                        </a>
                     </div>
                 </div>
             </article>
 
+            <section class="mt-16 grid gap-10 border-t border-slate-200 pt-12 md:grid-cols-3">
 
-            <!-- Hero image -->
-            <div class="mb-10 overflow-hidden rounded-xl shadow-sm">
-                <img src="@blog.CoverImageUrl"
-                     alt="@blog.Title"
-                     class="max-h-[500px] w-full object-cover" />
-            </div>
-
-            <!-- CARD ADS BANNER -->
-            <div class="mx-auto w-full max-w-md space-y-4">
-                <AdBannerDisplay AdBanners="@datasAds" @rendermode="new InteractiveServerRenderMode(prerender: true)" />
-            </div>
-
-            <!-- Content -->
-            <article class="prose prose-lg max-w-none leading-relaxed text-gray-800">
-                @((MarkupString)blog.Content)
-            </article>
-
-            <!-- Share section -->
-            <div class="mt-10 flex items-center gap-4 border-t pt-6">
-                <span class="text-sm font-medium text-gray-600">Chia sẻ:</span>
-                <!-- Facebook -->
-                <a href="@($"https://www.facebook.com/sharer/sharer.php?u={NavManager.Uri}")"
-                   target="_blank" rel="noopener"
-                   class="rounded-full p-2 transition hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.04 3.69 9.22 8.52 9.93v-7.03H8.24v-2.9h2.14V9.41c0-2.12 1.26-3.29 3.18-3.29.92 0 1.89.16 1.89.16v2.08h-1.07c-1.05 0-1.38.65-1.38 1.32v1.58h2.35l-.38 2.9h-1.97V22c4.83-.71 8.52-4.89 8.52-9.93z" />
-                    </svg>
-                </a>
-
-                <!-- Twitter / X -->
-                <a href="@($"https://twitter.com/intent/tweet?url={NavManager.Uri}&text={Uri.EscapeDataString(blog?.Title ?? "Tin tức | Tiện Ích Tài Xế")}")"
-                   target="_blank" rel="noopener"
-                   class="rounded-full p-2 transition hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-5 w-5 text-sky-500" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M4 3h4.09l4.02 5.62L15.9 3H20l-6.15 8.37L20.5 21h-4.09l-4.26-5.94L8.1 21H4l6.31-8.65L4 3z" />
-                    </svg>
-                </a>
-            </div>
-
-            <!-- Related -->
-            <section class="mt-12 grid gap-8 md:grid-cols-3">
-                <!-- UP NEXT -->
-                @if (RelatedPosts != null)
-                { 
+                @if (RelatedPosts != null && RelatedPosts.Any())
+                {
                     <div class="md:col-span-2">
-                        <h2 class="mb-4 border-b pb-2 text-2xl font-bold">Tiếp theo</h2>
+                        @if (datasAds != null && datasAds.Any())
+                        {
+                            <div class="mx-auto mb-8 max-w-4xl">
+                                <AdBannerDisplay AdBanners="@datasAds" @rendermode="new InteractiveServerRenderMode(prerender: true)" />
+                            </div>
+                        }
+                        <div class="mb-6 flex items-center gap-2">
+                            <div class="h-6 w-1.5 rounded-full bg-indigo-600"></div>
+                            <h2 class="text-2xl font-bold text-slate-800">Cùng chuyên mục</h2>
+                        </div>
+
                         <div class="grid gap-6 sm:grid-cols-2">
                             @foreach (var post in RelatedPosts)
                             {
-                                <a href="/blogs/@post.Slug#top" data-enhance-nav="false"
-                                   class="group block overflow-hidden rounded-xl shadow transition duration-200 hover:shadow-lg">
-                                    <img src="@post.CoverImageUrl" alt="@post.Title"
-                                         class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                                    <div class="p-4">
-                                        <h3 class="line-clamp-2 text-lg font-semibold text-gray-800 group-hover:text-red-600">
-                                            @post.Title
-                                        </h3>
-                                        <p class="mt-1 text-sm text-gray-500">@post.CreatedAt.ToString("dd/MM/yyyy")</p>
+                                <a href="/blogs/@post.Slug" class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-100 transition-all hover:shadow-md hover:ring-indigo-100">
+                                    <div class="aspect-video overflow-hidden">
+                                        <img src="@post.CoverImageUrl" alt="@post.Title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                    </div>
+                                    <div class="flex flex-1 flex-col justify-between p-4">
+                                        <h3 class="line-clamp-2 text-base font-bold text-slate-800 group-hover:text-indigo-600">@post.Title</h3>
+                                        <p class="mt-3 text-xs font-medium text-slate-400">@post.CreatedAt.ToString("dd/MM/yyyy")</p>
                                     </div>
                                 </a>
                             }
                         </div>
                     </div>
                 }
-                @if (PopularPosts != null)
-                { 
-                    <!-- MOST POPULAR -->
+
+                @if (PopularPosts != null && PopularPosts.Any())
+                {
                     <div>
-                        <h2 class="mb-4 border-b pb-2 text-2xl font-bold">Phổ biến</h2>
-                        <ul class="space-y-4">
-                            @foreach (var post in PopularPosts)
+                        <div class="mb-6 flex items-center gap-2">
+                            <div class="h-6 w-1.5 rounded-full bg-red-500"></div>
+                            <h2 class="text-2xl font-bold text-slate-800">Đọc nhiều nhất</h2>
+                        </div>
+
+                        <div class="flex flex-col gap-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+                            @for (int i = 0; i < PopularPosts.Count; i++)
                             {
-                                <li>
-                                    <a href="/blogs/@post.Slug#top" data-enhance-nav="false"
-                                       class="flex items-start space-x-3 transition hover:text-red-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="mt-1 h-5 w-5 text-red-500"
-                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M9 5l7 7-7 7" />
-                                        </svg>
-                                        <div>
-                                            <h3 class="line-clamp-2 text-base font-medium">@post.Title</h3>
-                                            <p class="text-xs text-gray-400">@post.CreatedAt.ToString("dd/MM/yyyy")</p>
+                                var post = PopularPosts[i];
+                                <a href="/blogs/@post.Slug" class="group flex items-start gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                                    <span class="text-3xl font-black text-slate-200 transition-colors group-hover:text-red-100">
+                                        @(i + 1)
+                                    </span>
+                                    <div>
+                                        <h3 class="line-clamp-2 text-sm font-semibold text-slate-700 transition-colors group-hover:text-red-600">@post.Title</h3>
+                                        <div class="mt-1 flex items-center gap-2 text-xs text-slate-400">
+                                            <span>@post.ViewCount.ToString("N0") view</span>
                                         </div>
-                                    </a>
-                                </li>
+                                    </div>
+                                </a>
                             }
-                        </ul>
+                        </div>
                     </div>
                 }
             </section>
         }
     </div>
-
 </main>
+
 @code {
     [Parameter] public string Slug { get; set; } = string.Empty;
     private Blog? blog { get; set; } = default!;
@@ -168,14 +178,20 @@
     private List<Blog> PopularPosts = new();
     private List<AdBanner> datasAds = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         blog = await BlogService.GetBySlugAsync($"{Slug}");
-        datasAds = (await AdBannerService.GetAllAsync()).ToList();
 
-        var db = await BlogService.GetAllAsync();
-        RelatedPosts = db.ToList();
-        var dbPopular = await BlogService.GetMostPopularAsync();
-        PopularPosts = dbPopular.ToList();
+        if (blog != null)
+        {
+            await BlogService.IncrementViewCountAsync(blog.Id);
+            datasAds = (await AdBannerService.GetAllAsync()).ToList();
+
+            var dbRelated = await BlogService.GetRelatedAsync(blog.Category, blog.Id, 4);
+            RelatedPosts = dbRelated.ToList();
+
+            var dbPopular = await BlogService.GetMostPopularAsync(5);
+            PopularPosts = dbPopular.ToList();
+        }
     }
 }

@@ -24,7 +24,7 @@
             }
         </div>
 
-        @* Bộ chọn ngày ở Cha *@
+        <!--Blazor static vs Js chuyển hướng url-->
         <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1 shadow-sm">
             <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-red-500">
                 <span>📅</span>
@@ -37,8 +37,7 @@
         </div>
     </div>
 
-    @* Truyền UserId và Date xuống Con *@
-    <CheckerBillComponentVer2 userId="@userId" date="@date"/>
+    <CheckerBillComponent userId="@userId" date="@date"/>
 </div>
 
 @code {
