@@ -14,7 +14,6 @@
                 <div class="grid grid-cols-1 gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:grid-cols-2">
 
                     <div class="space-y-2">
-                        @* Icon Xe *@
                         <div class="flex items-center gap-3">
                             <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.129-1.125V11.25a9 9 0 0 0-1.5-4.5L16.5 3.75h-9L4.5 6.75a9 9 0 0 0-1.5 4.5v2.25" />
@@ -22,7 +21,6 @@
                             <span class="text-sm text-gray-600">Số hiệu: <b class="text-gray-900">@(shiftWork.numberCar)</b></span>
                         </div>
 
-                        @* Icon Người *@
                         <div class="flex items-center gap-3">
                             <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -30,7 +28,6 @@
                             <span class="text-sm text-gray-600 uppercase">Tên: <b class="text-gray-900">@shiftWork.userId</b></span>
                         </div>
 
-                        @* Icon Xăng *@
                         @if (shiftWork.gasmoney != null && shiftWork.gasmoney != 0)
                         {
                             <div class="flex items-center gap-3">
@@ -44,7 +41,6 @@
                     </div>
 
                     <div class="space-y-2 border-gray-100 text-sm md:border-l md:pl-6">
-                        @* Icon Biểu đồ doanh thu *@
                         <div class="flex items-center gap-3">
                             <svg class="h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
@@ -52,7 +48,6 @@
                             <span class="text-gray-600">Doanh thu tháng: <b class="text-blue-600">@shiftWork.revenueByMonth.ltvVNDCurrency()</b></span>
                         </div>
 
-                        @* Xếp hạng tài xế *@
                         <div class="flex items-center gap-2">
                             <div class="flex h-5 w-5 items-center justify-center rounded-full bg-green-100">
                                 <svg class="h-3 w-3 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -155,7 +150,7 @@
                             <table class="w-full text-left text-xs text-gray-500">
                                 <thead class="border-b bg-gray-50 font-bold text-gray-700">
                                     <tr>
-                                        <th class="px-4 py-3 text-center">STT</th> @* Căn giữa tiêu đề cho đẹp *@
+                                        <th class="px-4 py-3 text-center">STT</th> 
                                         <th class="px-4 py-3">Thời gian (Đón -> Trả)</th>
                                         <th class="px-4 py-3">Lộ trình</th>
                                         <th class="px-4 py-3 text-center">KM</th>
@@ -206,7 +201,14 @@
                                         <span class="rounded bg-gray-100 px-2 py-0.5 font-bold text-[10px] text-gray-500 uppercase">
                                             Cuốc lẻ #@reverseIndex
                                         </span>
-                                        <img width="40" src="@((item.tpType.Contains("Xanh SM") ? "../imgs/logo-gsm.png" : "../imgs/logo-namthang.png"))" />
+                                        @if(item.tpType.Contains("Xanh SM"))
+                                        {
+                                            <p class="mb-1 leading-none font-bold text-[10px] text-green-600 uppercase">G</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-1 leading-none font-bold text-[10px] text-red-600 uppercase">N</p>
+                                        }
                                     </div>
 
                                     <div class="relative ml-1 space-y-2 border-l-2 border-gray-100 pl-4">
@@ -308,16 +310,23 @@
                             </div>
 
                             <!-- Tổng nợp - Doanh thu -->
-                            <div class="mt-4 rounded-2xl bg-slate-900 p-5 text-white shadow-lg">
+                            <div class="mt-4 rounded-2xl border border-blue-200/50 bg-[#9FD7F9]/50 p-5 text-slate-900 shadow-lg backdrop-blur-sm">
                                 <div class="flex items-center justify-between">
                                     <div class="space-y-1">
-                                        <p class="font-bold tracking-widest text-[10px] text-slate-400 uppercase">Số tiền thực nộp</p>
-                                        <p class="text-3xl font-black text-yellow-400">@shiftWork.totalPrice.ltvVNDCurrency()</p>
+                                        <p class="font-bold tracking-widest text-[10px] text-blue-800/70 uppercase">Số tiền thực nộp</p>
+                                        @* Đổi màu tiền từ vàng sang xanh đậm hoặc đen để nổi bật trên nền sáng *@
+                                        <p class="text-3xl font-black text-blue-900">@shiftWork.totalPrice.ltvVNDCurrency()</p>
                                     </div>
-                                    <img width="40" src="../icons/checkerdetail/cash.png" class="opacity-80" />
+                                    @* Loại bỏ opacity-80 hoặc dùng grayscale nếu muốn icon tiệp màu *@
+                                    <img width="40" src="../icons/checkerdetail/cash.png" class="brightness-90" />
                                 </div>
-                                <div class="mt-3 flex items-center gap-2 border-t border-slate-700 pt-3">
-                                    <span class="font-bold text-[10px] text-pink-400 uppercase">Doanh thu ngày: @shiftWork.revenueByDate.ltvVNDCurrency()</span>
+
+                                @* Đổi border-t sang màu đậm hơn nền một chút *@
+                                <div class="mt-3 flex items-center gap-2 border-t border-blue-300 pt-3">
+                                    @* Màu hồng cũ (pink-400) có thể hơi chói trên nền xanh, tôi gợi ý dùng blue-800 hoặc giữ nguyên tùy ý bạn *@
+                                    <span class="font-bold text-[10px] text-red-800 uppercase">
+                                        Doanh thu ngày: @shiftWork.revenueByDate.ltvVNDCurrency()
+                                    </span>
                                 </div>
                             </div>
                         </div>
