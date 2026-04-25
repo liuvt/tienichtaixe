@@ -38,6 +38,12 @@ window.forceDesktopView = function () {
 
 // ==============================================================================================================
 
+// Submit native form (Blazor gọi trực tiếp)
+window.tvtSubmitForm = (form) => {
+    if (form) form.submit();
+};
+// ==============================================================================================================
+
 //SwiperJS: effect Ds ảnh
 window.callSwiperJSEffect11 = async () => {
     var swiper5 = new Swiper(".swiperJsEffect", {

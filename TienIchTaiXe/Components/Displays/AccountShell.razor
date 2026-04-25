@@ -1,0 +1,113 @@
+﻿
+@inject AuthenticationStateProvider Auth
+
+@attribute [Authorize]
+
+<div class="mx-auto max-w-[1250px]">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <aside class="hidden lg:col-span-3 lg:block">
+            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-lg font-black text-white">
+                        @AvatarLetter
+                    </div>
+                    <div class="min-w-0">
+                        <div class="truncate text-sm font-black text-slate-900">@DisplayName</div>
+                        <div class="truncate text-xs text-slate-500">@Email</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="inline-flex items-center rounded-2xl bg-amber-50 px-3 py-1.5 text-xs font-black text-amber-900 ring-1 ring-amber-200">
+                        Tài khoản
+                    </span>
+                    <span class="inline-flex items-center rounded-2xl bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                        Online
+                    </span>
+                </div>
+
+                <div class="mt-5 space-y-4">
+                    <nav class="space-y-2" aria-label="Thông tin">
+                        <div class="px-2 text-xs font-black tracking-wide text-slate-400 uppercase">
+                            Thông tin
+                        </div>
+
+                        <NavLink href="/account" class="@NavClass" Match="NavLinkMatch.All">
+                            Tổng quan
+                        </NavLink>
+
+                        <NavLink href="/orders" class="@NavClass" Match="NavLinkMatch.Prefix">
+                            Đơn hàng
+                        </NavLink>
+                    </nav>
+
+                    <nav class="space-y-2" aria-label="Cài đặt">
+                        <div class="px-2 text-xs font-black tracking-wide text-slate-400 uppercase">
+                            Cài đặt
+                        </div>
+
+                        <NavLink href="/account/profile" class="@NavClass">
+                            Cá nhân
+                        </NavLink>
+
+                        <NavLink href="/account/security" class="@NavClass">
+                            Bảo mật
+                        </NavLink>
+
+                        @if (isAdmin)
+                        {
+                            <NavLink href="/dashboard" class="@NavClass" Match="NavLinkMatch.Prefix">
+                                Dashboard
+                            </NavLink>
+                        }
+                    </nav>
+
+                    <form method="post" action="/api/auth/logout-cookie">
+                        <button type="submit"
+                                class="block w-full rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-left text-sm font-black text-rose-700 transition hover:bg-rose-100">
+                            Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-9">
+            @ChildContent
+        </section>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+
+    private string DisplayName = "User";
+    private string Email = "";
+    private string AvatarLetter = "U";
+    private bool isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var s = await Auth.GetAuthenticationStateAsync();
+        var u = s.User;
+
+        DisplayName = u.FindFirstValue(ClaimTypes.GivenName)
+            ?? u.FindFirstValue("given_name")
+            ?? u.FindFirstValue("name")
+            ?? u.Identity?.Name
+            ?? "User";
+
+        Email = u.FindFirstValue(ClaimTypes.Email) ?? "";
+
+        AvatarLetter = string.IsNullOrWhiteSpace(DisplayName)
+            ? "U"
+            : DisplayName.Trim()[0].ToString().ToUpperInvariant();
+
+        isAdmin = u.IsInRole("Owner") || u.IsInRole("Administrator") || u.IsInRole("Manager");
+    }
+
+    private string NavClass =>
+        "block rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-900 transition " +
+        "hover:border-amber-300 hover:bg-amber-50 hover:text-amber-900 " +
+        "[&.active]:border-slate-900 [&.active]:bg-slate-900 [&.active]:text-white";
+}

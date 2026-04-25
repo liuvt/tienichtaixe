@@ -2,6 +2,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @layout MainAdminLayout
 @inject IBlogService BlogService 
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
 <div class="min-h-screen bg-slate-50 p-4">
     @if (!showForm)

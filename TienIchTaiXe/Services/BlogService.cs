@@ -30,16 +30,18 @@ namespace TienIchTaiXe.Services
 
         public async Task<Blog?> GetByIdAsync(int id)
         {
-            // Tạo context dùng 1 lần rồi hủy
             using var _context = await _factory.CreateDbContextAsync();
-            return await _context.Blogs.FindAsync(id);
+            // Đổi FindAsync thành FirstOrDefaultAsync để có thể kẹp thêm AsNoTracking
+            return await _context.Blogs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<Blog?> GetBySlugAsync(string slug)
         {
-            // Tạo context dùng 1 lần rồi hủy
             using var _context = await _factory.CreateDbContextAsync();
             return await _context.Blogs
+                .AsNoTracking() // Thêm dòng này để tăng tốc độ load trang chi tiết bài viết
                 .FirstOrDefaultAsync(b => b.Slug == slug && b.IsPublished);
         }
 

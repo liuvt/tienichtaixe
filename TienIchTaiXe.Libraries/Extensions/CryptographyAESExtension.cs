@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TienIchTaiXe.Extensions;
+namespace TienIchTaiXe.Libraries.Extensions;
 public static class CryptographyAESExtension
 {
     private const string SecretKey = "NamThangTaxi";

@@ -1,0 +1,24 @@
+﻿@page "/admin/dashboard"
+@page "/admin"
+@page "/dashboard"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@layout MainAdminLayout
+@inject NavigationManager NavManager
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<h3>DashboardAdmin</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Lấy đường dẫn hiện tại (bỏ đi phần domain gốc)
+        var currentUrl = NavManager.ToBaseRelativePath(NavManager.Uri).ToLower();
+
+        // Nếu người dùng vào bằng đường dẫn phụ, ép đổi về đường dẫn chính
+        if (currentUrl == "admin" || currentUrl == "dashboard")
+        {
+            // replace: true để ghi đè lịch sử trình duyệt, khi bấm nút Back sẽ không bị kẹt
+            NavManager.NavigateTo("/admin/dashboard", replace: true);
+        }
+    }
+}

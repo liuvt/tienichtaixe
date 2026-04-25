@@ -16,35 +16,26 @@ public enum AdPlacement
     ArticleInline = 9,       // Giữa bài viết
     Custom = 99              // Tự định nghĩa nơi khác
 }
-
-[Table("AdBanners")]
 public class AdBanner
 {
-    [Key]
     public int Id { get; set; }
 
     /// <summary>Tên nội bộ để quản lý, không nhất thiết hiển thị ra ngoài</summary>
-    [Required, MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>Tiêu đề / mô tả ngắn, có thể dùng làm alt text</summary>
-    [MaxLength(250)]
     public string? Title { get; set; }
 
     /// <summary>Đường dẫn ảnh banner (relative hoặc absolute)</summary>
-    [Required, MaxLength(500)]
     public string ImageUrl { get; set; } = string.Empty;
 
     /// <summary>Link khi click vào banner</summary>
-    [Required, MaxLength(500)]
     public string LinkUrl { get; set; } = string.Empty;
 
     /// <summary>Target, mặc định mở tab mới</summary>
-    [MaxLength(20)]
     public string Target { get; set; } = "_blank";
 
     /// <summary>Vị trí hiển thị (header, dưới ô tra cứu, sidebar…)</summary>
-    [Required]
     public AdPlacement Placement { get; set; } = AdPlacement.HomeHeader;
 
     /// <summary>Thứ tự hiển thị trong slider (nhỏ đứng trước)</summary>
@@ -60,7 +51,6 @@ public class AdBanner
     public DateTime? EndAt { get; set; }
 
     /// <summary>Ghi chú nội bộ (UTM, campaign name…)</summary>
-    [MaxLength(500)]
     public string? Notes { get; set; }
 
     /// <summary>Ngày tạo</summary>

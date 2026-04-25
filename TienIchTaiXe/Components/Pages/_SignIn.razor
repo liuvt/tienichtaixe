@@ -1,0 +1,162 @@
+﻿@page "/sign-in"
+@page "/dang-nhap"
+@page "/login"
+@rendermode InteractiveServer
+@layout MainEmptyLayout
+@inherits _SignInBase
+
+<div class="flex min-h-screen items-center justify-center bg-slate-50">
+    <AuthorizeView Context="authContext">
+        <Authorized>
+            <RedirectToHome />
+        </Authorized>
+
+        <NotAuthorized>
+            <div class="w-full max-w-md">
+                <div class="mb-6 text-center">
+                    <div class="mx-auto inline-flex items-center rounded-2xl bg-blue-50 px-3 py-1.5 text-xs font-black text-blue-900 ring-1 ring-blue-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 14H5A2 2 0 013 12V8a2 2 0 012-2h6a2 2 0 012 2v1h4l3 3v3a2 2 0 01-2 2h-1m-4 0a2 2 0 11-4 0m-8 0a2 2 0 11-4 0" />
+                        </svg>
+                        Tiện Ích Tài Xế • Cổng Nội Bộ
+                    </div>
+
+                    <h1 class="mt-3 text-2xl font-black text-slate-900">Đăng nhập hệ thống</h1>
+                    <p class="mt-1 text-sm text-slate-600">
+                        Nhập email và mật khẩu của bạn để truy cập bảng điều khiển.
+                    </p>
+                </div>
+
+                <div class="rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
+                    <EditForm Model="@models" FormName="TienIchTaiXeLoginForm" OnValidSubmit="OnValidSubmit">
+                        <DataAnnotationsValidator />
+
+                        <div class="space-y-4 p-6">
+                            <div>
+                                <label class="block text-sm font-black text-slate-900">Email tài xế</label>
+                                <p class="mt-1 text-xs text-slate-500">Sử dụng email đã được cấp</p>
+
+                                <input class="@InputClass(_processing) placeholder:font-normal placeholder:text-slate-200"
+                                       name="Email"
+                                       type="email"
+                                       autocomplete="email"
+                                       placeholder="taixe@tienichtaixe.vn"
+                                       @bind-value="models.Email"
+                                       @bind-value:event="oninput"
+                                       disabled="@_processing" />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-black text-slate-900">Mật khẩu</label>
+                                <p class="mt-1 text-xs text-slate-500">Tuyệt đối không chia sẻ mật khẩu!</p>
+
+                                <div class="relative mt-2">
+                                    <input class="@($"{InputClass(_processing)} pr-12 placeholder:font-normal placeholder:text-slate-200")"
+                                           name="Password"
+                                           type="@(_showPassword ? "text" : "password")"
+                                           autocomplete="current-password"
+                                           placeholder="••••••••"
+                                           @bind-value="models.Password"
+                                           @bind-value:event="oninput"
+                                           disabled="@_processing" />
+
+                                    <button type="button"
+                                            class="absolute inset-y-0 right-0 px-4 text-slate-500 hover:text-slate-700 disabled:opacity-50"
+                                            disabled="@_processing"
+                                            @onclick="TogglePassword"
+                                            aria-label="Hiện/ẩn mật khẩu">
+                                        @if (_showPassword)
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.477 10.48a3 3 0 004.243 4.243" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.88 9.88A3 3 0 0112 9c1.657 0 3 1.343 3 3 0 .407-.081.795-.228 1.149" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.228 6.228C4.58 7.493 3.3 9.156 2.458 12c1.274 4.057 5.065 7 9.542 7 1.557 0 3.043-.356 4.387-.999" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5c1.61 0 3.147.38 4.52 1.05" />
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2">
+                                <button type="button"
+                                        class="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 hover:bg-slate-100 focus:ring-4 focus:ring-blue-100 focus:outline-none disabled:opacity-50"
+                                        disabled="@_processing"
+                                        @onclick="CleanForm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-3-6.708M21 3v6h-6" />
+                                    </svg>
+                                    <span class="ml-2 text-sm font-black">Làm mới</span>
+                                </button>
+
+                                <button type="submit"
+                                        class="@SubmitClass(_processing)"
+                                        disabled="@_processing">
+                                    @if (_processing)
+                                    {
+                                        <svg class="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path>
+                                        </svg>
+                                        <span class="ml-2">Đang xử lý..</span>
+                                    }
+                                    else
+                                    {
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 17l5-5-5-5" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H3" />
+                                        </svg>
+                                        <span class="ml-2">Đăng nhập</span>
+                                    }
+                                </button>
+                            </div>
+                            
+                            <div class="pt-2">
+                                <a href="/dang-ky"
+                                   rel="noopener"
+                                   class="text-sm font-semibold text-blue-600 transition-colors hover:text-blue-800">
+                                    Tài xế mới? Đăng ký tại đây
+                                </a>
+                            </div>
+
+                            <div class="pt-1">
+                                <a href="https://zalo.me/84583479173"
+                                   target="_blank" rel="noopener"
+                                   class="text-sm font-semibold text-emerald-600 transition-colors hover:text-emerald-800">
+                                    Hỗ trợ sự cố đăng nhập qua Zalo
+                                </a>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(textResult))
+                            {
+                                <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                                    <ValidationSummary />
+                                    @textResult
+                                </div>
+                            }
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+<form @ref="_nativeForm"
+      method="post"
+      action="/api/auth/login-cookie?returnUrl=%2F"
+      data-enhance="false"
+      style="display:none">
+    <AntiforgeryToken />
+    <input type="hidden" name="Email" value="@models.Email" />
+    <input type="hidden" name="Password" value="@models.Password" />
+</form>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ using System.Net;
 using System.Text;
 using TienIchTaiXe.Components;
 using TienIchTaiXe.Data;
+using TienIchTaiXe.Data.Seeds;
+using TienIchTaiXe.Libraries.Models;
 using TienIchTaiXe.Libraries.Services;
 using TienIchTaiXe.Libraries.Services.Interfaces;
 using TienIchTaiXe.Services;
@@ -31,24 +34,33 @@ sudo systemctl status tienichtaixe --no-pager
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// API: Add controllers
-builder.Services.AddControllers();
+// Đăng ký toàn bộ Controller
+builder.Services.AddControllersWithViews();
+// Hỗ trợ sinh tài liệu API (thường đi kèm với Swagger/OpenAPI)
 builder.Services.AddEndpointsApiExplorer();
+
 
 // API: call HTTP client Hub để lấy dữ liệu API từ bên ngoài
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<CookieContainer>();
 
+#region AddPooledDbContextFactory giúp giảm overhead tạo context cho Blazor Server. Connect to SQL Server
 //Add identity
 builder.Services.AddIdentity<AppUser, IdentityRole>()
         .AddEntityFrameworkStores<tienichtaixeDBContext>()
         .AddDefaultTokenProviders();
 
-// Đăng ký DbContextFactory (Dành riêng cho Blazor Component để fix lỗi Disposed)
-builder.Services.AddDbContextFactory<tienichtaixeDBContext>(opt =>
+// Thêm factory để dùng trong Services (tránh concurrency) : Default or Vps
+builder.Services.AddPooledDbContextFactory<tienichtaixeDBContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration["ConnectionStrings:Vps"] ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"));
+    opt.UseSqlServer(builder.Configuration["ConnectionStrings:Vps"]
+        ?? throw new InvalidOperationException("Can't found ConnectionStrings:Vps"));
 });
+
+// AddDbContext vẫn giữ cho Identity
+builder.Services.AddScoped<tienichtaixeDBContext>(provider =>
+    provider.GetRequiredService<IDbContextFactory<tienichtaixeDBContext>>().CreateDbContext());
+#endregion
 
 // UI: Get httpClient API default
 builder.Services.AddScoped(
@@ -74,12 +86,13 @@ builder.Services.AddHttpClient("taxinamthang", client =>
 });
 
 // API: Add Jwt, Gooogle Authentication
+// Sử dụng cả Cookie Identity (web nội bộ) và JWT Bearer (API)
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    // Cookie Identity làm mặc định cho UI nội bộ
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
 })
-.AddJwtBearer(jwtBearerOptions =>
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
 {
     jwtBearerOptions.RequireHttpsMetadata = false;
     jwtBearerOptions.SaveToken = true;
@@ -115,10 +128,28 @@ builder.Services.AddSwaggerGen(
     }
 );
 
+//ASP.NET Core server – Web API, MVC controller : [Authorize]
+// Sử dụng cả Cookie Identity (web nội bộ) và JWT Bearer (API)
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CookieOrJwt", policy =>
+    {
+        policy.AddAuthenticationSchemes(
+            IdentityConstants.ApplicationScheme,
+            JwtBearerDefaults.AuthenticationScheme);
+
+        policy.RequireAuthenticatedUser();
+    });
+});
+
 #region Back-end Register serivces
 //ASP.NET Core server – Web API, MVC controller : [Authorize]
 builder.Services.AddAuthorization();
+
 //For SQL Server
+builder.Services.AddScoped<IAuthServer, AuthServer>();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AuthCookieClaimsServer>();
+
 builder.Services.AddScoped<IAdBannerService, AdBannerService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 
@@ -130,10 +161,15 @@ builder.Services.AddScoped<INotificationServices, NotificationServices>();
 #region Font-end Register services
 // Blazor (client-side or server-side UI): [Authorize], [AuthorizeView]
 builder.Services.AddAuthorizationCore();
-// Authentication
-//builder.Services.AddScoped<AuthenticationStateProvider, AuthenService>();
-//builder.Services.AddScoped<IAuthenService, AuthenService>();
+// JWT (API/Postman/mobile)
+builder.Services.AddScoped<IAuthJwtService, AuthJwtService>();
+builder.Services.AddScoped<IAuthCookieService, AuthCookieService>();
+
+// Sử dụng Cookie Identity không cần custom AuthenticationStateProvider
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+
 // UI: Register Client Services
 builder.Services.AddScoped<ICheckerBillService, CheckerBillService>();
 builder.Services.AddScoped<ICheckerSalaryService, CheckerSalaryService>();
@@ -144,9 +180,10 @@ builder.Services.AddScoped<ICheckerSalaryService, CheckerSalaryService>();
 // UI: Register Client Services
 builder.Services.AddScoped<IViolationService, ViolationService>();
 
+// Dùng để tự động validate token chống CSRF cho các request POST/PUT/PATCH/DELETE, nếu token không hợp lệ sẽ trả về 400 Bad Request
 builder.Services.AddAntiforgery(options =>
 {
-    options.Cookie.Name = "TienIchTaiXe.AntiForgery.v2.1";
+    options.Cookie.Name = "_CSRF.AntiForgery.v2.1";
     options.Cookie.SameSite = SameSiteMode.Lax; // tránh bị chặn bởi Facebook WebView
     options.Cookie.HttpOnly = true;
 
@@ -178,8 +215,31 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     };
 });
 
-var app = builder.Build();
+// Cookie không redirect 302 cho /api/* (trả 401)
+builder.Services.ConfigureApplicationCookie(opt =>
+{
+    opt.LoginPath = "/login";
 
+    opt.Events.OnRedirectToLogin = ctx =>
+    {
+        if (ctx.Request.Path.StartsWithSegments("/api"))
+        {
+            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+        ctx.Response.Redirect(ctx.RedirectUri);
+        return Task.CompletedTask;
+    };
+});
+
+var app = builder.Build();
+/*Data seeding*/
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<tienichtaixeDBContext>();
+    await db.Database.MigrateAsync();
+}
+await SeedIdentitys.SeedIdentityAsync(app.Services);
 
 // Đọc X-Forwarded-Proto, X-Forwarded-Host từ Nginx
 /* var baseUrl = $"{Request.Scheme}://{Request.Host}";

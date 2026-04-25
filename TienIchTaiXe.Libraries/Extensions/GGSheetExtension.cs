@@ -1,7 +1,7 @@
 ﻿using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 
-namespace TienIchTaiXe.Extensions;
+namespace TienIchTaiXe.Libraries.Extensions;
 public static class GGSheetExtension
 {
     /// <summary>

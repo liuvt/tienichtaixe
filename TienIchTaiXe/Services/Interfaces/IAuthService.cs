@@ -2,7 +2,6 @@
 using TienIchTaiXe.Libraries.Models.GGSheets;
 
 namespace TienIchTaiXe.Services.Interfaces;
-
 public interface IAuthService
 {
     Task<GGSUser> GetGGSUser(string msnv);

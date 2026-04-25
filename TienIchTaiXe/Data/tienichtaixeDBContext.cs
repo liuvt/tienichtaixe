@@ -16,10 +16,20 @@ public partial class tienichtaixeDBContext : IdentityDbContext<AppUser>
     }
 
     //Call Model to create table in database
-    public virtual DbSet<AdBanner> AdBanners { get; set; } = null!;
-    public virtual DbSet<Blog> Blogs { get; set; } = null!;
+    public DbSet<AdBanner> AdBanners => Set<AdBanner>();
+    public DbSet<Blog> Blogs => Set<Blog>();
 
-   
+    //Data seeding
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(tienichtaixeDBContext).Assembly);
+
+        // Chạy ở program.cs hoặc qua migration
+        //modelBuilder.SeedIdentityRoles();
+    }
+
 }
 
 //Update tool: dotnet tool update --global dotnet-ef
@@ -30,7 +40,7 @@ public partial class tienichtaixeDBContext : IdentityDbContext<AppUser>
 
 /* 
  * ///Publish project: 
-dotnet publish -c Release --output ./Publish TienIchTaiXe.csproj
+dotnet publish -c Release --output ./Publish-TienIchTaiXe TienIchTaiXe.csproj
 
  * ///Tailwind project: 
 npx @tailwindcss/cli -i ./TienIchTaiXe/TailwindImport/input.css -o ./TienIchTaiXe/wwwroot/css/tailwindcss.css --watch
