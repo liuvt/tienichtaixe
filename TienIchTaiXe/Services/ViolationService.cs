@@ -18,8 +18,7 @@ public class ViolationService : IViolationService
     {
         try
         {
-
-            var response = await httpClient.GetAsync($"webhook/tracuuphatnguoi?bienso={licensePlate}");
+            var response = await httpClient.GetAsync($"webhook/api-tcpn-tvtteam?bks={licensePlate}");
 
             if (response.IsSuccessStatusCode)
             {

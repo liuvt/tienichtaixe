@@ -73,8 +73,8 @@ builder.Services.AddScoped(
 builder.Services.AddHttpClient("n8n", client =>
 {
     client.BaseAddress = new Uri(
-        builder.Configuration["API:BackEnd"]
-        ?? throw new InvalidOperationException("Missing API:BackEnd"));
+        builder.Configuration["API:n8n"]
+        ?? throw new InvalidOperationException("Missing API:n8n"));
 });
 
 // Phiếu checker
