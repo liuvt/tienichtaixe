@@ -66,8 +66,9 @@ builder.Services.AddScoped<tienichtaixeDBContext>(provider =>
 builder.Services.AddScoped(
     defaultClient => new HttpClient
     {
-        //Default FontEnd
-        BaseAddress = new Uri(builder.Configuration["API:FontEnd"] ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"))
+        //Default Domain
+        BaseAddress = new Uri(builder.Configuration["API:Domain"] 
+            ?? throw new InvalidOperationException("Can't found [Secret Key] in appsettings.json !"))
     });
 
 builder.Services.AddHttpClient("n8n", client =>

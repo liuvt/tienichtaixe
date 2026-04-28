@@ -40,7 +40,7 @@ public partial class tienichtaixeDBContext : IdentityDbContext<AppUser>
 
 /* 
  * ///Publish project: 
-dotnet publish -c Release --output ./Publish-TienIchTaiXe TienIchTaiXe.csproj
+dotnet publish -c Release --output ./Publish-TIENICHTAIXE TienIchTaiXe.csproj
 
  * ///Tailwind project: 
 npx @tailwindcss/cli -i ./TienIchTaiXe/TailwindImport/input.css -o ./TienIchTaiXe/wwwroot/css/tailwindcss.css --watch
