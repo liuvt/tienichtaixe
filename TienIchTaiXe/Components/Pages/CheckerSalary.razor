@@ -167,7 +167,8 @@
     protected bool isLoaded = false;
     [Parameter] public string? date { get; set; }
 
-    private string maxMonthAllowed => DateTime.Now.AddMonths(-1).ToString("yyyy-MM");
+    private static DateTime VnNow => DateTime.UtcNow.AddHours(7);
+    private string maxMonthAllowed => VnNow.AddMonths(-1).ToString("yyyy-MM");
     private string currentMonthValue => ParseMonth(date).ToString("yyyy-MM");
 
     protected override async Task OnInitializedAsync()
@@ -241,6 +242,6 @@
             return dt;
         }
 
-        return DateTime.Now.AddMonths(-1);
+        return VnNow.AddMonths(-1);
     }
 }
