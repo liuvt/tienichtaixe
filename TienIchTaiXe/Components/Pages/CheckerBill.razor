@@ -43,8 +43,8 @@
 @code {
     [Parameter] public string userId { get; set; } = string.Empty;
     [Parameter] public string? date { get; set; }
-
-    private string maxDateAllowed => DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+    private static DateTime VnNow => DateTime.UtcNow.AddHours(7);
+    private string maxDateAllowed => VnNow.AddDays(-1).ToString("yyyy-MM-dd");
     private string currentDateValue => ParseDate(date).ToString("yyyy-MM-dd");
 
     private string keyword { get; set; } = string.Empty;
@@ -54,7 +54,7 @@
     {
         if (string.IsNullOrEmpty(date))
         {
-            date = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            date = VnNow.AddDays(-1).ToString("yyyy-MM-dd");
         }
 
         //Dicrypt userId trước khi so sánh, vì trong sheet đã được mã hóa để bảo mật thông tin tài xế
@@ -76,7 +76,7 @@
     {
         if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var d))
             return d;
-        return DateTime.Now.AddDays(-1);
+        return VnNow.AddDays(-1);
     }
 
     // Hàm kiểm tra xem đây có phải là phiếu cũ không (Trước ngày n-1)
@@ -84,7 +84,7 @@
     {
         if (DateTime.TryParse(date, out DateTime billDate))
         {
-            var yesterday = DateTime.Now.Date.AddDays(-1);
+            var yesterday = VnNow.Date.AddDays(-1);
             // Nếu ngày phiếu nhỏ hơn ngày hôm qua -> Phiếu cũ
             return billDate.Date < yesterday;
         }
