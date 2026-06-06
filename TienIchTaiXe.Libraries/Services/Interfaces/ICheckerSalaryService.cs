@@ -1,10 +1,7 @@
-﻿
-using TienIchTaiXe.Libraries.Models.GGSheets;
+﻿using TienIchTaiXe.Libraries.Entities;
 
 namespace TienIchTaiXe.Services.Interfaces;
 public interface ICheckerSalaryService
 {
-    Task<Salary> GetSalary(string userId);
-    Task<List<SalaryDetails>> GetSalaryDetails(string userId);
-
+    Task<CheckerSalaryDto> Get(string userId, string? date = null);
 }

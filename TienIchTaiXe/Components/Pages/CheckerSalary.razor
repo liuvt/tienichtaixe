@@ -10,7 +10,17 @@
             <img width="32" src="../icons/checkerdetail/bill-v2.png" alt="Đang tải..." />
             BẢNG KÊ THÁNG
         </p>
-        <p class="text-sm text-gray-600 italic">@salary.salaryDate</p>
+        <!--Blazor static vs Js chuyển hướng url-->
+        <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1 shadow-sm">
+            <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-red-500">
+                <span>📅</span>
+                <input type="month"
+                        class="cursor-pointer bg-transparent outline-none"
+                        value="@currentMonthValue"
+                        max="@maxMonthAllowed"
+                        onchange="if(this.value) { window.location.href = '/checkers/@userId/' + this.value; }" />
+            </label>
+        </div>
     </div>
 
     <div class="justify-center rounded-lg bg-white p-1 shadow md:p-6">
@@ -140,18 +150,29 @@
     public string userId { get; set; } = default!;
     [Inject]
     protected ICheckerSalaryService salaryService { get; set; } = default!;
-    protected Libraries.Models.GGSheets.Salary salary { get; set; } = new Libraries.Models.GGSheets.Salary();
+    protected CheckerSalaryDto checkerSalary { get; set; } = new CheckerSalaryDto();
+    protected Libraries.Models.Salary salary { get; set; } = new Libraries.Models.Salary();
     protected List<SalaryDetails> salaryDetails { get; set; } = new List<SalaryDetails>();
     protected List<DeductionItem> Deductions { get; set; } = new List<DeductionItem>();
     protected string errorMessage { get; set; } = string.Empty;
     protected bool isLoaded = false;
+    [Parameter] public string? date { get; set; }
+
+    private string maxMonthAllowed => DateTime.Now.AddMonths(-1).ToString("yyyy-MM");
+    private string currentMonthValue => ParseMonth(date).ToString("yyyy-MM");
+    
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            salary = await GetReSalary(userId);
-            salaryDetails = await salaryService.GetSalaryDetails(userId);
-            isLoaded = true;
+            // Trong Static SSR, hàm này chạy 1 lần trên Server mỗi khi URL thay đổi
+            if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(date))
+            {
+                checkerSalary = await salaryService.Get(userId, currentMonthValue);
+                salary = await GetReSalary(checkerSalary);
+                salaryDetails = checkerSalary.Details.OrderBy(x => x.daterevenues).ToList();
+                isLoaded = true;
+            }
         }
         catch (Exception ex)
         {
@@ -161,27 +182,55 @@
         }
     }
 
-    protected async Task<Libraries.Models.GGSheets.Salary> GetReSalary(string userId)
+    protected async Task<Libraries.Models.Salary> GetReSalary(CheckerSalaryDto _data)
     {
-        var _salary = await salaryService.GetSalary(userId);
+        var _salary = _data.Salary;
 
         Deductions.AddRange(new List<DeductionItem>
         {
-            new() { Name = "Ký quỹ",NameAlias= "Tiền ký quỹ với công ty", Amount = _salary.deductForDeposit}, //1. Trừ ký quỹ
-            new() { Name = "Tạm ứng",NameAlias= "Tạm ứng tiền công ty", Amount = _salary.deductForSalaryAdvance }, //2. Trừ lương ứng
-            new() { Name = "Âm ăn chia",NameAlias= "Trừ tiền âm ăn chia tháng trước (xe công ty)", Amount = _salary.deductForNegativeSalary }, //3. Trừ âm lương: Nợ tiền tháng trước, qua tháng này trừ lại vào lương (công ty)
-            new() { Name = "Biên bản",NameAlias= "Trừ vi phạm biên bản của tài xế", Amount = _salary.deductForViolationReport }, //4. Trừ vi phạm biên bản
-            new() { Name = "Nợ sửa chữa",NameAlias= "Chi phí phát sinh liên quan đến việc bảo trì, sửa chữa", Amount = _salary.no_sua_chua }, //5. Nợ sửa chữa
-            new() { Name = "Hao mòn vỏ xe", NameAlias = "Hao mòn vỏ xe", Amount = _salary.haomon_voxe }, //6. Hao mòn vỏ xe
-            new() { Name = "Sạt pin",NameAlias="Trừ sạt pin đối với ăn chia ngày", Amount = _salary.deductForCharging },//7. Sat pin
-            new() { Name = "Phạt sạc",NameAlias="Sạc pin đầy nhưng không rút sạt", Amount = _salary.deductForChargingPenalty },//8. phạt sạt: Charging Penalty
-            new() { Name = "VETC",NameAlias="Qua trạm thu phí", Amount = _salary.deductForTollPayment }, //9. Trừ tiền qua trạm : Deduction for Toll Payment
-            new() { Name = "BHXH",NameAlias="BHXH", Amount = _salary.deductForSocialInsurance }, //10. Trừ BHXH
-            new() { Name = "Âm ăn chia (xe thương quyền)",NameAlias="Trừ tiền âm ăn chia tháng trước (xe thương quyền)", Amount = _salary.deductForNegativeSalaryPartner }, //11. Trừ âm lương: Nợ tiền tháng trước, qua tháng này trừ lại vào lương (Thương quyền)
-            new() { Name = "TNCN",NameAlias="TNCN", Amount = _salary.deductForPIT }, //12. Trừ TNCN - Personal Income Tax Deduction
-            new() { Name = "Trừ khác",NameAlias=_salary.noteDeductOrder, Amount = _salary.deductForOrder } //13. Trừ khác - 14. Ghi chú trừ khác
+            new() { Name = "Ký quỹ",NameAlias= "Tiền ký quỹ với công ty", Amount = _salary.deductForDeposit.ltvVNDCurrency()}, //1. Trừ ký quỹ
+            new() { Name = "Tạm ứng",NameAlias= "Tạm ứng tiền công ty", Amount = _salary.deductForSalaryAdvance.ltvVNDCurrency() }, //2. Trừ lương ứng
+            new() { Name = "Âm ăn chia",NameAlias= "Trừ tiền âm ăn chia tháng trước (xe công ty)", Amount = _salary.deductForNegativeSalary.ltvVNDCurrency() }, //3. Trừ âm lương: Nợ tiền tháng trước, qua tháng này trừ lại vào lương (công ty)
+            new() { Name = "Biên bản",NameAlias= "Trừ vi phạm biên bản của tài xế", Amount = _salary.deductForViolationReport.ltvVNDCurrency() }, //4. Trừ vi phạm biên bản
+            new() { Name = "Nợ sửa chữa",NameAlias= "Chi phí phát sinh liên quan đến việc bảo trì, sửa chữa", Amount = _salary.no_sua_chua.ltvVNDCurrency() }, //5. Nợ sửa chữa
+            new() { Name = "Hao mòn vỏ xe", NameAlias = "Hao mòn vỏ xe", Amount = _salary.haomon_voxe.ltvVNDCurrency() }, //6. Hao mòn vỏ xe
+            new() { Name = "Sạt pin",NameAlias="Trừ sạt pin đối với ăn chia ngày", Amount = _salary.deductForCharging.ltvVNDCurrency() },//7. Sat pin
+            new() { Name = "Phạt sạc",NameAlias="Sạc pin đầy nhưng không rút sạt", Amount = _salary.deductForChargingPenalty.ltvVNDCurrency() },//8. phạt sạt: Charging Penalty
+            new() { Name = "VETC",NameAlias="Qua trạm thu phí", Amount = _salary.deductForTollPayment.ltvVNDCurrency() }, //9. Trừ tiền qua trạm : Deduction for Toll Payment
+            new() { Name = "BHXH",NameAlias="BHXH", Amount = _salary.deductForSocialInsurance.ltvVNDCurrency() }, //10. Trừ BHXH
+            new() { Name = "Âm ăn chia (xe thương quyền)",NameAlias="Trừ tiền âm ăn chia tháng trước (xe thương quyền)", Amount = _salary.deductForNegativeSalaryPartner.ltvVNDCurrency() }, //11. Trừ âm lương: Nợ tiền tháng trước, qua tháng này trừ lại vào lương (Thương quyền)
+            new() { Name = "TNCN",NameAlias="TNCN", Amount = _salary.deductForPIT.ltvVNDCurrency() }, //12. Trừ TNCN - Personal Income Tax Deduction
+            new() { Name = "Trừ khác",NameAlias=_salary.noteDeductOrder, Amount = _salary.deductForOrder.ltvVNDCurrency() } //13. Trừ khác - 14. Ghi chú trừ khác
         });
 
         return _salary;
     }
+
+    private DateTime ParseMonth(string? value)
+{
+    if (string.IsNullOrWhiteSpace(value))
+        return DateTime.Now.AddMonths(-1);
+
+    if (DateTime.TryParseExact(
+            value,
+            "MM-yyyy",
+            null,
+            System.Globalization.DateTimeStyles.None,
+            out var dt))
+    {
+        return dt;
+    }
+
+    if (DateTime.TryParseExact(
+            value,
+            "yyyy-MM",
+            null,
+            System.Globalization.DateTimeStyles.None,
+            out dt))
+    {
+        return dt;
+    }
+
+    return DateTime.Now.AddMonths(-1);
+}
 }

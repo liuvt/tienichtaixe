@@ -9,13 +9,6 @@ public class CheckerBillService : ICheckerBillService
 {
     private readonly HttpClient httpClient;
 
-    /*
-     * //Constructor
-    public CheckerBillService(HttpClient _httpClient)
-    {
-        this.httpClient = _httpClient;
-    }
-    */
     public CheckerBillService(IHttpClientFactory httpClientFactory)
     {
         this.httpClient = httpClientFactory.CreateClient("taxinamthang");
@@ -73,6 +66,7 @@ public class CheckerBillService : ICheckerBillService
                     return new ShiftWorkDto();
 
                 var result = await response.Content.ReadFromJsonAsync<ShiftWorkDto>();
+
 
                 if (result == null)
                     return new ShiftWorkDto();
