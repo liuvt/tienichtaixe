@@ -22,9 +22,9 @@ public class CheckerSalaryService : ICheckerSalaryService
         {
             HttpResponseMessage response;
             if (string.IsNullOrWhiteSpace(date))
-                response = await httpClient.GetAsync($"api/ShiftWork/get-salary-crypto?cryptoAES={userId}");
+                response = await httpClient.GetAsync($"api/Salary/get-salary-crypto?cryptoAES={userId}");
             else
-                response = await httpClient.GetAsync($"api/ShiftWork/get-salary-crypto?cryptoAES={userId}&date={date}");
+                response = await httpClient.GetAsync($"api/Salary/get-salary-crypto?cryptoAES={userId}&date={date}");
 
             if (response.IsSuccessStatusCode)
             {

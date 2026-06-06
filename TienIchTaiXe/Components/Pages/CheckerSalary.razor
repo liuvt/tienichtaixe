@@ -1,4 +1,5 @@
 ﻿@page "/salary/{userId}"
+@page "/salary/{userId}/{date}"
 @layout MainEmptyLayout
 
 <HeaderSEODisplay Title="Bảng kê v1.2"
@@ -12,14 +13,20 @@
         </p>
         <!--Blazor static vs Js chuyển hướng url-->
         <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1 shadow-sm">
-            <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-red-500">
-                <span>📅</span>
-                <input type="month"
-                        class="cursor-pointer bg-transparent outline-none"
-                        value="@currentMonthValue"
-                        max="@maxMonthAllowed"
-                        onchange="if(this.value) { window.location.href = '/checkers/@userId/' + this.value; }" />
-            </label>
+            <span>📅</span>
+            <div class="relative">
+                <input id="monthPicker"
+                       type="month"
+                       class="absolute inset-0 cursor-pointer opacity-0"
+                       value="@currentMonthValue"
+                       max="@maxMonthAllowed"
+                       onchange="if(this.value){window.location.href='/salary/@userId/'+this.value;}" />
+
+                <div class="font-bold text-red-500">
+                    @ParseMonth(date).ToString("MM/yyyy")
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -100,7 +107,7 @@
             </div>
             <!-- Bảng chuẩn -->
             <div class="overflow-x-auto">
-                @if(((salary.salaryType != "Lương tháng")))
+                @if (((salary.salaryType != "Lương tháng")))
                 {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -121,24 +128,26 @@
                             }
                         </tbody>
                     </table>
-                }else{
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ngày</th>
-                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Doanh thu</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @foreach (var item in salaryDetails)
-                        {
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-sm whitespace-nowrap">@item.daterevenues</td>
-                                <td class="px-4 py-3 text-right text-sm whitespace-nowrap text-green-700">@item.revenue</td>
+                }
+                else
+                {
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ngày</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Doanh thu</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @foreach (var item in salaryDetails)
+                            {
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-sm whitespace-nowrap">@item.daterevenues</td>
+                                    <td class="px-4 py-3 text-right text-sm whitespace-nowrap text-green-700">@item.revenue</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 }
             </div>
         </div>
@@ -160,19 +169,20 @@
 
     private string maxMonthAllowed => DateTime.Now.AddMonths(-1).ToString("yyyy-MM");
     private string currentMonthValue => ParseMonth(date).ToString("yyyy-MM");
-    
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            // Trong Static SSR, hàm này chạy 1 lần trên Server mỗi khi URL thay đổi
-            if (!string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(date))
-            {
-                checkerSalary = await salaryService.Get(userId, currentMonthValue);
-                salary = await GetReSalary(checkerSalary);
-                salaryDetails = checkerSalary.Details.OrderBy(x => x.daterevenues).ToList();
-                isLoaded = true;
-            }
+            var month = currentMonthValue;
+
+            checkerSalary = await salaryService.Get(userId, month);
+            salary = await GetReSalary(checkerSalary);
+            salaryDetails = checkerSalary.Details
+                .OrderBy(x => x.daterevenues)
+                .ToList();
+
+            isLoaded = true;
         }
         catch (Exception ex)
         {
@@ -207,30 +217,30 @@
     }
 
     private DateTime ParseMonth(string? value)
-{
-    if (string.IsNullOrWhiteSpace(value))
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return DateTime.Now.AddMonths(-1);
+
+        if (DateTime.TryParseExact(
+                value,
+                "MM-yyyy",
+                null,
+                System.Globalization.DateTimeStyles.None,
+                out var dt))
+        {
+            return dt;
+        }
+
+        if (DateTime.TryParseExact(
+                value,
+                "yyyy-MM",
+                null,
+                System.Globalization.DateTimeStyles.None,
+                out dt))
+        {
+            return dt;
+        }
+
         return DateTime.Now.AddMonths(-1);
-
-    if (DateTime.TryParseExact(
-            value,
-            "MM-yyyy",
-            null,
-            System.Globalization.DateTimeStyles.None,
-            out var dt))
-    {
-        return dt;
     }
-
-    if (DateTime.TryParseExact(
-            value,
-            "yyyy-MM",
-            null,
-            System.Globalization.DateTimeStyles.None,
-            out dt))
-    {
-        return dt;
-    }
-
-    return DateTime.Now.AddMonths(-1);
-}
 }
