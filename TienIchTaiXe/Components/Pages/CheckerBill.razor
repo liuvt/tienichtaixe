@@ -25,15 +25,17 @@
         </div>
 
         <!--Blazor static vs Js chuyển hướng url-->
-        <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1 shadow-sm">
-            <label class="flex cursor-pointer items-center gap-2 text-sm font-bold text-red-500">
-                <span>📅</span>
-                <input type="date" 
-                       class="cursor-pointer bg-transparent outline-none"
-                       value="@currentDateValue" 
-                       max="@maxDateAllowed" 
-                       onchange="if(this.value) { window.location.href = '/checkers/@userId/' + this.value; }" />
-            </label>
+        <div class="relative mt-2 inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1 shadow-sm">
+            <span class="pointer-events-none text-sm font-bold text-red-500">
+                @ParseDate(date).ToString("dd/MM/yyyy")
+            </span>
+
+            <input type="date"
+                   class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                   value="@currentDateValue"
+                   max="@maxDateAllowed"
+                   onchange="if(this.value){window.location.href='/checkers/@userId/'+this.value;}" />
+            <span class="pointer-events-none">📅</span>
         </div>
     </div>
 

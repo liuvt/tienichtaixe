@@ -26,7 +26,6 @@
                     @ParseMonth(date).ToString("MM/yyyy")
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -196,6 +195,8 @@
     {
         var _salary = _data.Salary;
 
+        Console.WriteLine($"Calculating deductions for user: {_salary.userId}, NameAlias: {_salary.noteDeductOrder}, Amount: {_salary.deductForOrder}");
+
         Deductions.AddRange(new List<DeductionItem>
         {
             new() { Name = "Ký quỹ",NameAlias= "Tiền ký quỹ với công ty", Amount = _salary.deductForDeposit.ltvVNDCurrency()}, //1. Trừ ký quỹ
@@ -204,8 +205,8 @@
             new() { Name = "Biên bản",NameAlias= "Trừ vi phạm biên bản của tài xế", Amount = _salary.deductForViolationReport.ltvVNDCurrency() }, //4. Trừ vi phạm biên bản
             new() { Name = "Nợ sửa chữa",NameAlias= "Chi phí phát sinh liên quan đến việc bảo trì, sửa chữa", Amount = _salary.no_sua_chua.ltvVNDCurrency() }, //5. Nợ sửa chữa
             new() { Name = "Hao mòn vỏ xe", NameAlias = "Hao mòn vỏ xe", Amount = _salary.haomon_voxe.ltvVNDCurrency() }, //6. Hao mòn vỏ xe
-            new() { Name = "Sạt pin",NameAlias="Trừ sạt pin đối với ăn chia ngày", Amount = _salary.deductForCharging.ltvVNDCurrency() },//7. Sat pin
-            new() { Name = "Phạt sạc",NameAlias="Sạc pin đầy nhưng không rút sạt", Amount = _salary.deductForChargingPenalty.ltvVNDCurrency() },//8. phạt sạt: Charging Penalty
+            new() { Name = "Sạc pin",NameAlias="Trừ Sạc pin đối với ăn chia ngày", Amount = _salary.deductForCharging.ltvVNDCurrency() },//7. Sat pin
+            new() { Name = "Phạt sạc",NameAlias="Sạc pin đầy nhưng không rút Sạc", Amount = _salary.deductForChargingPenalty.ltvVNDCurrency() },//8. phạt Sạc: Charging Penalty
             new() { Name = "VETC",NameAlias="Qua trạm thu phí", Amount = _salary.deductForTollPayment.ltvVNDCurrency() }, //9. Trừ tiền qua trạm : Deduction for Toll Payment
             new() { Name = "BHXH",NameAlias="BHXH", Amount = _salary.deductForSocialInsurance.ltvVNDCurrency() }, //10. Trừ BHXH
             new() { Name = "Âm ăn chia (xe thương quyền)",NameAlias="Trừ tiền âm ăn chia tháng trước (xe thương quyền)", Amount = _salary.deductForNegativeSalaryPartner.ltvVNDCurrency() }, //11. Trừ âm lương: Nợ tiền tháng trước, qua tháng này trừ lại vào lương (Thương quyền)
